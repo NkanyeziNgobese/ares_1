@@ -1,0 +1,14 @@
+numpy>=1.26
+pandas>=2.2
+pydantic>=2.7
+python-dotenv>=1.0
+paho-mqtt>=1.6,<2.0
+rich>=13.7
+typer>=0.12
+
+# optional plotting
+matplotlib>=3.8
+
+# optional ML placeholders
+# torch>=2.2
+# tensorflow>=2.16

@@ -1,0 +1,41 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Publish Telemetry",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/python/scripts/publish_telemetry.py",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Subscribe Telemetry",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/python/scripts/subscribe_telemetry.py",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Subscribe Events",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/python/scripts/subscribe_events.py",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Run Anomaly Detector",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/python/scripts/run_anomaly_detector.py",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal"
+    }
+  ]
+}
