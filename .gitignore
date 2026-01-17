@@ -34,3 +34,12 @@ UserSettings/
 # OS
 .DS_Store
 Thumbs.db
+
+# Learning notes (local-only)
+learning_notes/
+learning_notes/**
+
+# Data
+data/volve/
+data/volve/**
+data/raw/
