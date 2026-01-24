@@ -43,3 +43,7 @@ learning_notes/**
 data/volve/
 data/volve/**
 data/raw/
+data/volve_logs/
+
+# Git filter repo
+git-filter-repo.py
