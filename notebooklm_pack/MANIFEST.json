@@ -1,0 +1,85 @@
+{
+    "base_path":  "notebooklm_pack",
+    "generated_at":  "2026-01-26T13:47:28",
+    "note":  "MANIFEST.json intentionally omitted from items to avoid self-reference.",
+    "items":  [
+                  {
+                      "path":  "agents/context/mission_context.md",
+                      "size_bytes":  1013,
+                      "last_modified":  "2026-01-16T17:33:00",
+                      "description":  "MQTT topic map and run context."
+                  },
+                  {
+                      "path":  "data/volve_logs/ARES1_READY_README.md",
+                      "size_bytes":  831,
+                      "last_modified":  "2026-01-24T19:30:19",
+                      "description":  "Preparation notes and assumptions for the Ares-1 ready dataset."
+                  },
+                  {
+                      "path":  "docs/architecture/system_overview.md",
+                      "size_bytes":  1497,
+                      "last_modified":  "2026-01-16T17:32:41",
+                      "description":  "Tiered system overview and MQTT data flow."
+                  },
+                  {
+                      "path":  "docs/dataset_health_report.md",
+                      "size_bytes":  5741,
+                      "last_modified":  "2026-01-26T13:36:54",
+                      "description":  "Dataset readiness report with missingness and quality notes."
+                  },
+                  {
+                      "path":  "docs/dataset_quick_stats.json",
+                      "size_bytes":  12365,
+                      "last_modified":  "2026-01-26T13:02:39",
+                      "description":  "Numeric stats backing the health report."
+                  },
+                  {
+                      "path":  "docs/dataset_usage_plan.md",
+                      "size_bytes":  2233,
+                      "last_modified":  "2026-01-26T13:35:45",
+                      "description":  "Primary dataset selection, column mapping, and status enum."
+                  },
+                  {
+                      "path":  "docs/planned_data_flow.md",
+                      "size_bytes":  3318,
+                      "last_modified":  "2026-01-26T13:35:56",
+                      "description":  "Canonical Volve -\u003e Karoo -\u003e MQTT pipeline stages and failure modes."
+                  },
+                  {
+                      "path":  "FLOW_ANCHOR.md",
+                      "size_bytes":  1344,
+                      "last_modified":  "2026-01-26T13:46:34",
+                      "description":  "ASCII flow, status enum, and Karoo override metrics."
+                  },
+                  {
+                      "path":  "PROJECT_STAGE_SUMMARY.md",
+                      "size_bytes":  2092,
+                      "last_modified":  "2026-01-26T13:46:34",
+                      "description":  "Current project stage, risks, and next steps."
+                  },
+                  {
+                      "path":  "python/scripts/ares_karoo_publisher.py",
+                      "size_bytes":  1353,
+                      "last_modified":  "2026-01-24T10:00:29",
+                      "description":  "Example Karoo-style MQTT publisher."
+                  },
+                  {
+                      "path":  "README.md",
+                      "size_bytes":  1976,
+                      "last_modified":  "2026-01-16T17:36:47",
+                      "description":  "High-level project overview, MQTT workflow, and repo map."
+                  },
+                  {
+                      "path":  "scripts/analyze_volve_dataset_health.py",
+                      "size_bytes":  19890,
+                      "last_modified":  "2026-01-26T13:35:06",
+                      "description":  "Health scoring rubric and dataset quality analysis."
+                  },
+                  {
+                      "path":  "UPLOAD_CHECKLIST.md",
+                      "size_bytes":  2473,
+                      "last_modified":  "2026-01-26T13:46:34",
+                      "description":  "Checklist of included files and why they matter."
+                  }
+              ]
+}

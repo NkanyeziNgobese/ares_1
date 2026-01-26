@@ -1,0 +1,462 @@
+{
+  "generated_at": "2026-01-26T11:02:39.044283Z",
+  "datasets": [
+    {
+      "path": "data/volve_logs/volve_drilling_ares1_ready.csv",
+      "size_bytes": 100019679,
+      "rows": 2836277,
+      "cols": 4,
+      "columns": [
+        "BIT_DEPTH_m",
+        "ROP_mh",
+        "VIBRATION_0_5",
+        "STATUS"
+      ],
+      "missingness": {
+        "BIT_DEPTH_m": {
+          "missing": 0,
+          "missing_rate": 0.0,
+          "non_null": 2836277,
+          "non_null_rate": 1.0
+        },
+        "ROP_mh": {
+          "missing": 0,
+          "missing_rate": 0.0,
+          "non_null": 2836277,
+          "non_null_rate": 1.0
+        },
+        "VIBRATION_0_5": {
+          "missing": 0,
+          "missing_rate": 0.0,
+          "non_null": 2836277,
+          "non_null_rate": 1.0
+        },
+        "STATUS": {
+          "missing": 0,
+          "missing_rate": 0.0,
+          "non_null": 2836277,
+          "non_null_rate": 1.0
+        }
+      },
+      "numeric_stats": {
+        "BIT_DEPTH_m": {
+          "count": 2836277,
+          "min": 0.0,
+          "max": 3465.1919,
+          "mean": 1098.5374945261528,
+          "std": 1319.4037621831283
+        },
+        "ROP_mh": {
+          "count": 2836277,
+          "min": 0.0,
+          "max": 30.52576259999964,
+          "mean": 0.9319536596240464,
+          "std": 4.43004053556876
+        },
+        "VIBRATION_0_5": {
+          "count": 2836277,
+          "min": 0.0,
+          "max": 5.0,
+          "mean": 0.7386863790722196,
+          "std": 1.279543668334094
+        }
+      },
+      "fully_empty_rows": 0,
+      "fully_empty_row_pct": 0.0,
+      "duplicate_sample": {
+        "method": "first_rows",
+        "sample_rows": 200000,
+        "duplicate_rows": 62691,
+        "duplicate_rate": 0.313455
+      },
+      "standard_columns": {
+        "depth": "BIT_DEPTH_m",
+        "rop": "ROP_mh",
+        "vibration": "VIBRATION_0_5",
+        "time": null
+      },
+      "depth": {
+        "column": "BIT_DEPTH_m",
+        "min": 0.0,
+        "max": 3465.1919,
+        "negative_count": 0
+      },
+      "rop": {
+        "column": "ROP_mh",
+        "min": 0.0,
+        "max": 30.52576259999964,
+        "mean": 0.9319536596240464,
+        "std": 4.43004053556876
+      },
+      "vibration": {
+        "column": "VIBRATION_0_5",
+        "min": 0.0,
+        "max": 5.0,
+        "mean": 0.7386863790722196,
+        "std": 1.279543668334094,
+        "expected_range": [
+          0.0,
+          5.0
+        ],
+        "out_of_range_count": 0
+      },
+      "time": {
+        "column": null,
+        "non_null_rate": 0.0
+      },
+      "unit_flags": [],
+      "fit_score": 70,
+      "fit_score_notes": [
+        "Depth coverage >90% (+30)",
+        "ROP coverage >70% (+20)",
+        "Vibration coverage >70% (+20)"
+      ]
+    },
+    {
+      "path": "data/volve_logs/volve_drilling_best.csv",
+      "size_bytes": 48473392,
+      "rows": 3888262,
+      "cols": 4,
+      "columns": [
+        "BIT_DEPTH",
+        "TIME",
+        "ROP",
+        "VIBRATION"
+      ],
+      "missingness": {
+        "BIT_DEPTH": {
+          "missing": 877478,
+          "missing_rate": 0.22567357858086723,
+          "non_null": 3010784,
+          "non_null_rate": 0.7743264214191328
+        },
+        "TIME": {
+          "missing": 3888260,
+          "missing_rate": 0.9999994856313695,
+          "non_null": 2,
+          "non_null_rate": 5.143686305089524e-07
+        },
+        "ROP": {
+          "missing": 1926558,
+          "missing_rate": 0.49548050002803307,
+          "non_null": 1961704,
+          "non_null_rate": 0.5045194999719669
+        },
+        "VIBRATION": {
+          "missing": 3884423,
+          "missing_rate": 0.9990126694137381,
+          "non_null": 3839,
+          "non_null_rate": 0.000987330586261934
+        }
+      },
+      "numeric_stats": {
+        "BIT_DEPTH": {
+          "count": 3010784,
+          "min": -90.8097,
+          "max": 3465.1919,
+          "mean": 1033.8114230522917,
+          "std": 1306.9166673401105
+        },
+        "ROP": {
+          "count": 1961704,
+          "min": 0.0,
+          "max": 47.2850568,
+          "mean": 0.6409069363505913,
+          "std": 4.00261799855203
+        },
+        "VIBRATION": {
+          "count": 3839,
+          "min": 1.5164200784809558,
+          "max": 5.0,
+          "mean": 2.49608346228036,
+          "std": 0.8109142561667861
+        }
+      },
+      "fully_empty_rows": 873046,
+      "fully_empty_row_pct": 0.2245337376956594,
+      "duplicate_sample": {
+        "method": "first_rows",
+        "sample_rows": 200000,
+        "duplicate_rows": 154966,
+        "duplicate_rate": 0.77483
+      },
+      "standard_columns": {
+        "depth": "BIT_DEPTH",
+        "rop": "ROP",
+        "vibration": "VIBRATION",
+        "time": "TIME"
+      },
+      "depth": {
+        "column": "BIT_DEPTH",
+        "min": -90.8097,
+        "max": 3465.1919,
+        "negative_count": 174507
+      },
+      "rop": {
+        "column": "ROP",
+        "min": 0.0,
+        "max": 47.2850568,
+        "mean": 0.6409069363505913,
+        "std": 4.00261799855203
+      },
+      "vibration": {
+        "column": "VIBRATION",
+        "min": 1.5164200784809558,
+        "max": 5.0,
+        "mean": 2.49608346228036,
+        "std": 0.8109142561667861,
+        "expected_range": [
+          0.0,
+          5.0
+        ],
+        "out_of_range_count": 0
+      },
+      "time": {
+        "column": "TIME",
+        "non_null_rate": 5.143686305089524e-07
+      },
+      "unit_flags": [
+        "Negative depth values detected"
+      ],
+      "fit_score": 5,
+      "fit_score_notes": [
+        "Depth coverage >70% (+15)",
+        "ROP coverage >40% (+10)",
+        "Fully empty rows >10% (-10)",
+        "Negative depth values (-10)"
+      ]
+    },
+    {
+      "path": "data/volve_logs/volve_drilling_best_wide.csv",
+      "size_bytes": 175697457,
+      "rows": 3888262,
+      "cols": 13,
+      "columns": [
+        "BIT_DEPTH",
+        "TIME",
+        "TIME_RAW",
+        "ROP",
+        "ROP_RAW",
+        "VIBRATION",
+        "VIBRATION_RAW",
+        "WOB",
+        "RPM",
+        "TORQUE",
+        "SPP",
+        "HKLD",
+        "FLOW"
+      ],
+      "missingness": {
+        "BIT_DEPTH": {
+          "missing": 877478,
+          "missing_rate": 0.22567357858086723,
+          "non_null": 3010784,
+          "non_null_rate": 0.7743264214191328
+        },
+        "TIME": {
+          "missing": 3888260,
+          "missing_rate": 0.9999994856313695,
+          "non_null": 2,
+          "non_null_rate": 5.143686305089524e-07
+        },
+        "TIME_RAW": {
+          "missing": 3888260,
+          "missing_rate": 0.9999994856313695,
+          "non_null": 2,
+          "non_null_rate": 5.143686305089524e-07
+        },
+        "ROP": {
+          "missing": 1926558,
+          "missing_rate": 0.49548050002803307,
+          "non_null": 1961704,
+          "non_null_rate": 0.5045194999719669
+        },
+        "ROP_RAW": {
+          "missing": 1927149,
+          "missing_rate": 0.49563249595834846,
+          "non_null": 1961113,
+          "non_null_rate": 0.5043675040416515
+        },
+        "VIBRATION": {
+          "missing": 3884423,
+          "missing_rate": 0.9990126694137381,
+          "non_null": 3839,
+          "non_null_rate": 0.000987330586261934
+        },
+        "VIBRATION_RAW": {
+          "missing": 3884423,
+          "missing_rate": 0.9990126694137381,
+          "non_null": 3839,
+          "non_null_rate": 0.000987330586261934
+        },
+        "WOB": {
+          "missing": 1927149,
+          "missing_rate": 0.49563249595834846,
+          "non_null": 1961113,
+          "non_null_rate": 0.5043675040416515
+        },
+        "RPM": {
+          "missing": 1927149,
+          "missing_rate": 0.49563249595834846,
+          "non_null": 1961113,
+          "non_null_rate": 0.5043675040416515
+        },
+        "TORQUE": {
+          "missing": 2353917,
+          "missing_rate": 0.6053905318108708,
+          "non_null": 1534345,
+          "non_null_rate": 0.39460946818912923
+        },
+        "SPP": {
+          "missing": 988672,
+          "missing_rate": 0.25427093133127343,
+          "non_null": 2899590,
+          "non_null_rate": 0.7457290686687266
+        },
+        "HKLD": {
+          "missing": 1054103,
+          "missing_rate": 0.2710987582626891,
+          "non_null": 2834159,
+          "non_null_rate": 0.7289012417373109
+        },
+        "FLOW": {
+          "missing": 1927149,
+          "missing_rate": 0.49563249595834846,
+          "non_null": 1961113,
+          "non_null_rate": 0.5043675040416515
+        }
+      },
+      "numeric_stats": {
+        "BIT_DEPTH": {
+          "count": 3010784,
+          "min": -90.8097,
+          "max": 3465.1919,
+          "mean": 1033.8114230522917,
+          "std": 1306.9166673401105
+        },
+        "ROP": {
+          "count": 1961704,
+          "min": 0.0,
+          "max": 47.2850568,
+          "mean": 0.6409069363505913,
+          "std": 4.00261799855203
+        },
+        "ROP_RAW": {
+          "count": 1961113,
+          "min": 0.0,
+          "max": 0.013918246,
+          "mean": 0.00017781181308582222,
+          "std": 0.0011108155309119208
+        },
+        "VIBRATION": {
+          "count": 3839,
+          "min": 1.5164200784809558,
+          "max": 5.0,
+          "mean": 2.49608346228036,
+          "std": 0.8109142561667861
+        },
+        "VIBRATION_RAW": {
+          "count": 3839,
+          "min": 0.0,
+          "max": 6.0,
+          "mean": 0.6061474342276635,
+          "std": 0.5135554831947695
+        },
+        "WOB": {
+          "count": 1961113,
+          "min": -6366670000.0,
+          "max": 1312150.0,
+          "mean": 49995.69304400601,
+          "std": 6433900.236341285
+        },
+        "RPM": {
+          "count": 1961113,
+          "min": -0.029552559,
+          "max": 25.85,
+          "mean": 0.1222424841457976,
+          "std": 0.5648254285867851
+        },
+        "TORQUE": {
+          "count": 1534345,
+          "min": 0.0,
+          "max": 0.0,
+          "mean": 0.0,
+          "std": 0.0
+        },
+        "SPP": {
+          "count": 2899590,
+          "min": -857930.8,
+          "max": 50336027.0,
+          "mean": 2190434.092061824,
+          "std": 6001101.523175506
+        },
+        "HKLD": {
+          "count": 2834159,
+          "min": -106002800000000.0,
+          "max": 10598529000000.0,
+          "mean": -25125439.253622327,
+          "std": 64133327662.25975
+        },
+        "FLOW": {
+          "count": 1961113,
+          "min": 0.0,
+          "max": 0.0,
+          "mean": 0.0,
+          "std": 0.0
+        }
+      },
+      "fully_empty_rows": 0,
+      "fully_empty_row_pct": 0.0,
+      "duplicate_sample": {
+        "method": "first_rows",
+        "sample_rows": 200000,
+        "duplicate_rows": 218,
+        "duplicate_rate": 0.00109
+      },
+      "standard_columns": {
+        "depth": "BIT_DEPTH",
+        "rop": "ROP",
+        "vibration": "VIBRATION",
+        "time": "TIME"
+      },
+      "depth": {
+        "column": "BIT_DEPTH",
+        "min": -90.8097,
+        "max": 3465.1919,
+        "negative_count": 174507
+      },
+      "rop": {
+        "column": "ROP",
+        "min": 0.0,
+        "max": 47.2850568,
+        "mean": 0.6409069363505913,
+        "std": 4.00261799855203
+      },
+      "vibration": {
+        "column": "VIBRATION",
+        "min": 1.5164200784809558,
+        "max": 5.0,
+        "mean": 2.49608346228036,
+        "std": 0.8109142561667861,
+        "expected_range": [
+          0.0,
+          5.0
+        ],
+        "out_of_range_count": 0
+      },
+      "time": {
+        "column": "TIME",
+        "non_null_rate": 5.143686305089524e-07
+      },
+      "unit_flags": [
+        "Negative depth values detected"
+      ],
+      "fit_score": 15,
+      "fit_score_notes": [
+        "Depth coverage >70% (+15)",
+        "ROP coverage >40% (+10)",
+        "Negative depth values (-10)"
+      ]
+    }
+  ]
+}
