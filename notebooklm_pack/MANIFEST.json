@@ -1,6 +1,6 @@
 {
     "base_path":  "notebooklm_pack",
-    "generated_at":  "2026-01-26T13:47:28",
+    "generated_at":  "2026-01-26T13:50:24",
     "note":  "MANIFEST.json intentionally omitted from items to avoid self-reference.",
     "items":  [
                   {
@@ -48,13 +48,13 @@
                   {
                       "path":  "FLOW_ANCHOR.md",
                       "size_bytes":  1344,
-                      "last_modified":  "2026-01-26T13:46:34",
+                      "last_modified":  "2026-01-26T13:50:03",
                       "description":  "ASCII flow, status enum, and Karoo override metrics."
                   },
                   {
                       "path":  "PROJECT_STAGE_SUMMARY.md",
                       "size_bytes":  2092,
-                      "last_modified":  "2026-01-26T13:46:34",
+                      "last_modified":  "2026-01-26T13:50:03",
                       "description":  "Current project stage, risks, and next steps."
                   },
                   {
@@ -77,8 +77,8 @@
                   },
                   {
                       "path":  "UPLOAD_CHECKLIST.md",
-                      "size_bytes":  2473,
-                      "last_modified":  "2026-01-26T13:46:34",
+                      "size_bytes":  2409,
+                      "last_modified":  "2026-01-26T13:50:03",
                       "description":  "Checklist of included files and why they matter."
                   }
               ]
