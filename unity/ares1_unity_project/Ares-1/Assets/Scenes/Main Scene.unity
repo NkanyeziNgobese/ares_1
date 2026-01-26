@@ -119,6 +119,58 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &845190269
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 845190271}
+  - component: {fileID: 845190270}
+  m_Layer: 0
+  m_Name: Ares_WellboreProxy
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &845190270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 845190269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2911ca445cd4ee84f915db21f6c60f3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AresMqttSubscriber
+  brokerAddress: 127.0.0.1
+  brokerPort: 1883
+  topic: ares1/telemetry/realtime
+  depthPositiveDown: 1
+  depthLerpSpeed: 5
+  vibrationThreshold: 30
+  shakeAmplitude: 0.05
+  shakeDampSpeed: 8
+--- !u!4 &845190271
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 845190269}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -10672, y: 2954, z: -15971.547}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1675357912
 GameObject:
   m_ObjectHideFlags: 0
@@ -372,3 +424,4 @@ SceneRoots:
   - {fileID: 1675357915}
   - {fileID: 1797067298}
   - {fileID: 1996611134}
+  - {fileID: 845190271}
