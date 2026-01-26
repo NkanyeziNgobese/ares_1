@@ -2,17 +2,23 @@
 
 ## What We Have
 The repo currently contains three Volve-derived drilling telemetry datasets under `data/volve_logs/`.
+The primary dataset for Ares-1 replay and all downstream explanations is
+`data/volve_logs/volve_drilling_ares1_ready.csv`. The other datasets are upstream extraction
+artifacts used to derive or validate it.
 
-| Dataset | Size | Rows | Cols | Fit Score | Notes |
-| --- | --- | --- | --- | --- | --- |
-| `data/volve_logs/volve_drilling_ares1_ready.csv` | 95.39 MB | 2,836,277 | 4 | 70 | Dense, fixed-tick ready, no TIME |
-| `data/volve_logs/volve_drilling_best.csv` | 46.23 MB | 3,888,262 | 4 | 5 | Sparse vibration, negative depths, many empty rows |
-| `data/volve_logs/volve_drilling_best_wide.csv` | 167.56 MB | 3,888,262 | 13 | 15 | More signals (WOB/RPM/TORQUE/SPP/etc.), TIME sparse |
+| Dataset | Role | Size | Rows | Cols | Fit Score | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| `data/volve_logs/volve_drilling_ares1_ready.csv` | Primary | 95.39 MB | 2,836,277 | 4 | 70 | Main dataset, dense, fixed-tick ready, no TIME |
+| `data/volve_logs/volve_drilling_best.csv` | Upstream | 46.23 MB | 3,888,262 | 4 | 5 | Sparse vibration, negative depths, many empty rows |
+| `data/volve_logs/volve_drilling_best_wide.csv` | Upstream | 167.56 MB | 3,888,262 | 13 | 15 | More signals (WOB/RPM/TORQUE/SPP/etc.), TIME sparse |
 
 Fit scores come from the rubric in `scripts/analyze_volve_dataset_health.py` and are summarized in
 `docs/dataset_quick_stats.json`.
 
 ## Dataset Snapshots (Quality + Distribution)
+Snapshots focus on the primary Ares-1 ready dataset first, then list upstream sources for
+lineage and diagnostics.
+
 ### `data/volve_logs/volve_drilling_ares1_ready.csv`
 - Columns: `BIT_DEPTH_m`, `ROP_mh`, `VIBRATION_0_5`, `STATUS`
 - Missingness: 0% for depth/ROP/vibration
@@ -54,7 +60,7 @@ Fit scores come from the rubric in `scripts/analyze_volve_dataset_health.py` and
 
 ## Is It Usable?
 ### Ares-1 Telemetry Replay (fixed tick)
-- **Yes** for `data/volve_logs/volve_drilling_ares1_ready.csv`.
+- **Yes** for `data/volve_logs/volve_drilling_ares1_ready.csv` (primary dataset).
   - Dense depth/ROP/vibration, status column present, and already cleaned.
 - **No (directly)** for `data/volve_logs/volve_drilling_best.csv`.
   - Needs negative depth filtering, vibration proxy fill, and row cleanup first.
@@ -85,7 +91,7 @@ Results:
 - Best wide: **15** (has proxy signals but still sparse core channels)
 
 ## Recommended Path Forward
-1) **Use `data/volve_logs/volve_drilling_ares1_ready.csv` for replay**.
+1) **Use `data/volve_logs/volve_drilling_ares1_ready.csv` as the primary replay input**.
 2) Keep `volve_drilling_best_wide.csv` as the proxy-signal source of record.
 3) If TIME becomes available, re-derive Ares-1 ready with a real time index.
 4) Maintain explicit links to source anchors and assumptions for traceability.

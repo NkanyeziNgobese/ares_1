@@ -2,15 +2,19 @@
 
 ## Pipeline Diagram (Numbered Stages)
 
+<div align="center">
+
 ```mermaid
 flowchart TD
-  A["1 Raw Volve Spreadsheets"] --> B["2 Aggregation/Extraction: volve_drilling_best_wide"]
-  B --> C["3 Cleaning + Proxy Fill: volve_drilling_ares1_ready"]
-  C --> D["4 Karoo Transform: depth to negative meters, dolerite + hazard"]
-  D --> E["5 Replay Buffer / DataFrame Streamer"]
+  A["1 Raw Volve<br/>Spreadsheets"] --> B["2 Aggregation/Extraction:<br/>volve_drilling_best_wide"]
+  B --> C["3 Cleaning + Proxy Fill:<br/>volve_drilling_ares1_ready"]
+  C --> D["4 Karoo Transform:<br/>depth to negative meters,<br/>dolerite + hazard"]
+  D --> E["5 Replay Buffer /<br/>DataFrame Streamer"]
   E --> F["6 MQTT Broker"]
-  F --> G["7 Unity Ares-1 Subscriber / Digital Twin"]
+  F --> G["7 Unity Ares-1 Subscriber /<br/>Digital Twin"]
 ```
+
+</div>
 
 ## Stage-by-Stage Narrative
 
@@ -32,12 +36,13 @@ flowchart TD
 
 - Inputs: `volve_drilling_best_wide.csv` (preferred) or `volve_drilling_best.csv`
 - Outputs: `data/volve_logs/volve_drilling_ares1_ready.csv`
+- Role: primary dataset for all downstream Ares-1 replay and Karoo steps
 - Assumptions: TIME missing -> fixed tick replay, depth sorted
 - Failure modes: proxy signals missing, negative depths not filtered, unstable interpolation
 
 ### 4) Karoo Transform (Geology Overrides)
 
-- Inputs: Ares-1 ready dataset
+- Inputs: Ares-1 ready dataset (primary dataset)
 - Outputs: transformed telemetry (depth negative, status overrides)
 - Assumptions: depth sorting is deterministic
 - Failure modes: missing depth, invalid depth scaling, override zones not applied

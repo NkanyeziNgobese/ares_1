@@ -1,14 +1,19 @@
 # Dataset Usage Plan (Ares-1 Telemetry + Karoo Pipeline)
 
-## Which File We Will Use (Decision Tree)
-- If `data/volve_logs/volve_drilling_ares1_ready.csv` exists -> **use it**.
-- Else -> use `data/volve_logs/volve_drilling_best.csv` and **derive an Ares-1 ready dataset**
+## Primary Dataset (Current Default)
+The main dataset is `data/volve_logs/volve_drilling_ares1_ready.csv`. All downstream steps
+assume this file as the starting point.
+
+Fallback if missing:
+- Use `data/volve_logs/volve_drilling_best.csv` (or `volve_drilling_best_wide.csv`) and derive
+  `volve_drilling_ares1_ready.csv`:
   - Remove negative depths
   - Fill ROP and compute vibration proxy
   - Save as `volve_drilling_ares1_ready.csv`
 
 ## Column -> Telemetry JSON Mapping
-The publisher will emit JSON payloads similar to `python/scripts/ares_karoo_publisher.py`:
+Mapping assumes `data/volve_logs/volve_drilling_ares1_ready.csv` as the input dataset. The
+publisher will emit JSON payloads similar to `python/scripts/ares_karoo_publisher.py`:
 
 | Dataset Column | Telemetry JSON Field | Units | Notes |
 | --- | --- | --- | --- |

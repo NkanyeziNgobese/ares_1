@@ -38,6 +38,7 @@ Thumbs.db
 # Learning notes (local-only)
 learning_notes/
 learning_notes/**
+notebooklm_pack/
 
 # Data
 data/volve/

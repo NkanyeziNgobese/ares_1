@@ -8,6 +8,7 @@ Owner/Subsystem: data_health
 Upstream: data/volve_logs/*.csv
 Downstream: docs/dataset_quick_stats.json, docs/dataset_health_report.md
 Role: compute dataset quality metrics and provide fit-for-purpose scoring guidance.
+Primary dataset: data/volve_logs/volve_drilling_ares1_ready.csv
 Reference: docs/planned_data_flow.md (pipeline context)
 
 === Inputs / Outputs ===
@@ -30,7 +31,7 @@ Side effects: console logs with progress/heartbeats
 - External: pandas
 
 === Main Flow Narration ===
-1) Discover Volve-derived datasets (Ares-1 ready, best, and wide).
+1) Discover Volve-derived datasets, starting with the primary Ares-1 ready file.
 2) Stream each dataset in chunks to compute missingness and numeric stats.
 3) Flag unit anomalies and compute a fit score for Ares-1 replay.
 4) Write a machine-readable JSON summary for documentation.
@@ -69,6 +70,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 CHUNK_SIZE = 200_000
 DUPLICATE_SAMPLE_ROWS = 200_000
 LARGE_FILE_BYTES = 500 * 1024 * 1024
+PRIMARY_DATASET_NAME = "volve_drilling_ares1_ready.csv"
 
 
 @dataclass
@@ -323,7 +325,7 @@ def discover_datasets() -> List[Path]:
       - Output: [Path("data/volve_logs/volve_drilling_ares1_ready.csv"), ...]
     """
     candidates = [
-        "volve_drilling_ares1_ready.csv",
+        PRIMARY_DATASET_NAME,
         "volve_drilling_best.csv",
         "volve_drilling_best_wide.csv",
     ]
@@ -581,13 +583,22 @@ def main() -> None:
             )
         )
         datasets = discover_datasets()
+        primary_path = REPO_ROOT / "data" / "volve_logs" / PRIMARY_DATASET_NAME
+        if not primary_path.exists():
+            log(
+                "Primary dataset missing: data/volve_logs/{name}. "
+                "Analysis will proceed with upstream artifacts only.".format(
+                    name=PRIMARY_DATASET_NAME
+                )
+            )
         if not datasets:
             log("No datasets found under data/volve_logs.")
             return
 
         results = []
         for path in datasets:
-            log(f"Analyzing {path.name}")
+            role = "primary" if path.name == PRIMARY_DATASET_NAME else "upstream"
+            log(f"Analyzing {path.name} ({role} dataset)")
             results.append(analyze_dataset(path))
 
         output = {
