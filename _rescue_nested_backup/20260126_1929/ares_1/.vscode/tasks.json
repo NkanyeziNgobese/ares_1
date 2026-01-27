@@ -1,0 +1,68 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "MQTT: Up",
+      "type": "shell",
+      "command": "docker compose -f mqtt/docker-compose.yml up -d",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "MQTT: Down",
+      "type": "shell",
+      "command": "docker compose -f mqtt/docker-compose.yml down",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Python: Create venv",
+      "type": "shell",
+      "command": "python -m venv .venv",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Python: Install deps",
+      "type": "shell",
+      "command": "python -m pip install -r python/requirements.txt -r python/requirements-dev.txt",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run: Publish Telemetry",
+      "type": "shell",
+      "command": "python python/scripts/publish_telemetry.py",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run: Subscribe Telemetry",
+      "type": "shell",
+      "command": "python python/scripts/subscribe_telemetry.py",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run: Subscribe Events",
+      "type": "shell",
+      "command": "python python/scripts/subscribe_events.py",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    }
+  ]
+}
