@@ -13,20 +13,23 @@ Fallback if missing:
 
 ## Column -> Telemetry JSON Mapping
 Mapping assumes `data/volve_logs/volve_drilling_ares1_ready.csv` as the input dataset. The
-publisher will emit JSON payloads similar to `python/scripts/ares_karoo_publisher.py`:
+publisher will emit JSON payloads similar to `python/ares1/telemetry/ares_karoo_publisher.py`:
 
 | Dataset Column | Telemetry JSON Field | Units | Notes |
 | --- | --- | --- | --- |
-| `BIT_DEPTH_m` | `depth` | m (negative after Karoo transform) | Depth is negated in Karoo stage to represent subsurface depth |
+| `BIT_DEPTH_m` (or `BIT_DEPTH`) | `depth` | m (negative after Karoo transform) | Depth is **scaled** to the Ares-1 range using Excel datums (origin/TD) |
 | `ROP_mh` | `rop` | m/h | Derived from Volve ROP, clipped and interpolated |
 | `VIBRATION_0_5` | `vibration` | 0-5 (scaled) | Karoo stage may multiply in dolerite zone |
 | `STATUS` | `status` | enum | Set in Karoo stage (see below) |
 
 ## Status Enum and Assignment
-Status is assigned in the Karoo transform stage:
-- `OK`: default for normal shale drilling
-- `DOLERITE_SILL`: depth in [-1375, -1225]
-- `ECCA_HAZARD`: depth <= -1400
+Status is assigned in the Karoo transform stage using **Excel** zone boundaries
+from `Ares-1 terrain metrics.xlsx` (repo root):
+- `OVERBURDEN` (GEO_Beaufort): depth in [0, -800]
+- `UPPER GAS TARGET` (GEO_Ecca_Shale_Upper): depth in [-800, -1200]
+- `HAZARD: DOLERITE SILL` (GEO_Dolerite_Sill): depth in [-1200, -1400]
+- `LOWER GAS TARGET (HIGH PRESSURE)` (GEO_Ecca_Shale_Lower): depth in [-1400, -2500]
+- `BASIN TERMINUS` (GEO_Dwyka): depth in [-2500, -3500]
 
 ## Missing Data Handling (Explicit Rules)
 - **Depth missing** -> drop row (hard requirement).

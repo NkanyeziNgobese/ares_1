@@ -44,7 +44,7 @@ flowchart TD
 
 - Inputs: Ares-1 ready dataset (primary dataset)
 - Outputs: transformed telemetry (depth negative, status overrides)
-- Assumptions: depth sorting is deterministic
+- Assumptions: depth sorting is deterministic; depth scaling + zones use `Ares-1 terrain metrics.xlsx` (repo root)
 - Failure modes: missing depth, invalid depth scaling, override zones not applied
 
 ### 5) Replay Buffer / DataFrame Streamer
@@ -57,7 +57,7 @@ flowchart TD
 ### 6) MQTT Broker
 
 - Inputs: telemetry JSON events
-- Outputs: MQTT topics (e.g., `ares1/telemetry/realtime`)
+- Outputs: MQTT topics (e.g., `ares1/telemetry/main`)
 - Assumptions: broker reachable and stable
 - Failure modes: broker unavailable, message drop, schema mismatch
 
@@ -70,12 +70,12 @@ flowchart TD
 
 ## Where We Inject Karoo Geology Overrides
 
-Overrides are applied in Stage 4 (Karoo Transform):
+Overrides are applied in Stage 4 (Karoo Transform), using Excel-derived boundaries:
 
-- **Dolerite sill zone**: depth range **[-1375, -1225]** meters
-  - Apply vibration multiplier and status override
-- **Ecca hazard zone**: depth **<= -1400** meters
-  - Apply hazard status and fallback safety rules
+- **GEO_Dolerite_Sill**: depth range **[-1400, -1200]** meters
+  - Apply vibration clamp and torque/ROP overrides
+- **GEO_Ecca_Shale_Lower**: depth range **[-2500, -1400]** meters
+  - Apply ROP dampening and maturity hint in status
 
 ## Determinism & Replay Timing
 

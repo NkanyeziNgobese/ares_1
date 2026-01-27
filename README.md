@@ -49,7 +49,13 @@ Outputs land in `outputs/`:
 - `outputs/telemetry_latest.json`
 - `outputs/events_log.jsonl`
 
+## Karoo Telemetry Publisher (Excel-driven)
+
+- Metrics source of truth: `Ares-1 terrain metrics.xlsx` (repo root)
+- Publisher: `python/ares1/telemetry/ares_karoo_publisher.py`
+
 ## Folder Map
+
 - `docs/`: architecture, runbooks, grounding templates
 - `agents/`: mission context and run config SoT
 - `mqtt/`: local Mosquitto broker
@@ -58,12 +64,14 @@ Outputs land in `outputs/`:
 - `outputs/`: logs and reports (git-ignored)
 
 ## Next Milestones
+
 - LSTM autoencoder for torque anomalies
 - Volve ingestion and feature alignment
 - Unity visualization with MQTT playback
 - Agentic MCP links to doc sources
 
 ## Safety and Constraints
+
 - Grounding documents are required for any real well context.
 - Engineering docs are the single source of truth (SoT).
 - Keep secrets out of git and use `.env` locally.
