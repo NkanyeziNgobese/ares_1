@@ -68,6 +68,7 @@ lineage and diagnostics.
 ### Karoo Transformation (depth scaling + geology overrides)
 - **Yes** if using the Ares-1 ready dataset.
   - Depth is clean and suitable for the negative-depth Karoo transform.
+  - Ares-1 depth scaling and zone overrides should follow `Ares-1 terrain metrics.xlsx` (repo root).
 - **Conditional** if using best/wide.
   - Must remove negative depths and fill vibration before applying geology overrides.
 
@@ -95,7 +96,8 @@ Results:
 2) Keep `volve_drilling_best_wide.csv` as the proxy-signal source of record.
 3) If TIME becomes available, re-derive Ares-1 ready with a real time index.
 4) Maintain explicit links to source anchors and assumptions for traceability.
-5) If `docs/vole_source_anchors.md` or `docs/assumptions.md` are missing, create them now.
+5) Use `Ares-1 terrain metrics.xlsx` (repo root) as the depth/zone source of truth for Karoo scaling.
+6) If `docs/vole_source_anchors.md` or `docs/assumptions.md` are missing, create them now.
 
 ## References
 - Planned flow: `docs/planned_data_flow.md`
