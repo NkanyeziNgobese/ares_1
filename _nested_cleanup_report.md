@@ -1,0 +1,605 @@
+﻿# Migration Plan: Nested Folder Cleanup
+
+## A) Repo Root + Canonical Paths Confirmed
+- ROOT: C:/Users/nkany/OneDrive/Desktop/Projects/Ares 1/ares_1
+- Unity project root: unity/ares1_unity_project/Ares-1
+- Python root: python/ares1
+
+## B) Redundant Folder Candidates Found
+Suspects:
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\\ares_1
+Nested .git folders detected:
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\.git
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\.git
+
+### Tree Summary (depth <= 4; excluded: .git, .venv, .pytest_cache, __pycache__, Library, Temp, Logs, UserSettings, node_modules)
+#### ROOT
+- [D] .vscode
+- [D] agents
+- [D] ares_1
+- [D] data
+- [D] docs
+- [D] learning_notes
+- [D] mqtt
+- [D] notebooklm_pack
+- [D] notebooks
+- [D] outputs
+- [D] python
+- [D] scripts
+- [D] tools
+- [D] unity
+- [F] .env.example
+- [F] .gitignore
+- [F] git-filter-repo.py
+- [F] README.md
+-   [F] .vscode\launch.json
+-   [F] .vscode\settings.json
+-   [F] .vscode\tasks.json
+-   [D] agents\context
+-     [F] agents\context\mission_context.md
+-   [D] ares_1\.vscode
+-   [D] ares_1\agents
+-   [D] ares_1\ares_1
+-   [D] ares_1\docs
+-   [D] ares_1\mqtt
+-   [D] ares_1\python
+-   [D] ares_1\scripts
+-   [D] ares_1\unity
+-   [F] ares_1\.gitignore
+-   [F] ares_1\README.md
+-     [F] ares_1\.vscode\launch.json
+-     [F] ares_1\.vscode\settings.json
+-     [F] ares_1\.vscode\tasks.json
+-     [D] ares_1\agents\context
+-       [F] ares_1\agents\context\mission_context.md
+-     [D] ares_1\docs\architecture
+-     [D] ares_1\docs\grounding
+-     [F] ares_1\docs\dataset_health_report.md
+-     [F] ares_1\docs\dataset_quick_stats.json
+-     [F] ares_1\docs\dataset_usage_plan.md
+-     [F] ares_1\docs\planned_data_flow.md
+-       [F] ares_1\docs\architecture\physics_baseline.md
+-       [F] ares_1\docs\architecture\system_overview.md
+-       [F] ares_1\docs\grounding\well_plan_grounding.md
+-     [F] ares_1\mqtt\docker-compose.yml
+-     [F] ares_1\mqtt\mosquitto.conf
+-     [F] ares_1\mqtt\README.md
+-     [D] ares_1\python\ares1
+-     [D] ares_1\python\scripts
+-     [D] ares_1\python\tests
+-     [F] ares_1\python\pyproject.toml
+-     [F] ares_1\python\README.md
+-     [F] ares_1\python\requirements-dev.txt
+-     [F] ares_1\python\requirements.txt
+-       [D] ares_1\python\ares1\ml
+-       [D] ares_1\python\ares1\physics
+-       [D] ares_1\python\ares1\telemetry
+-       [D] ares_1\python\ares1\utils
+-       [F] ares_1\python\ares1\__init__.py
+-       [F] ares_1\python\scripts\ares_karoo_publisher.py
+-       [F] ares_1\python\scripts\ares_volve_publisher.py
+-       [F] ares_1\python\scripts\inspect_volve_production_xlsx.py
+-       [F] ares_1\python\scripts\publish_telemetry.py
+-       [F] ares_1\python\scripts\run_anomaly_detector.py
+-       [F] ares_1\python\scripts\subscribe_events.py
+-       [F] ares_1\python\scripts\subscribe_telemetry.py
+-       [F] ares_1\python\tests\conftest.py
+-       [F] ares_1\python\tests\test_anomaly_logic.py
+-       [F] ares_1\python\tests\test_torque_drag.py
+-     [F] ares_1\scripts\analyze_volve_dataset_health.py
+-     [D] ares_1\unity\ares1_unity_project
+-     [D] ares_1\unity\Assets
+-     [F] ares_1\unity\README.md
+-       [D] ares_1\unity\ares1_unity_project\Ares-1
+-       [D] ares_1\unity\Assets\Ares1
+-       [D] ares_1\unity\Assets\Scripts
+-       [F] ares_1\unity\Assets\ares_terrain.blend
+-       [F] ares_1\unity\Assets\ares_terrain.blend1
+-   [D] data\raw
+-   [D] data\sample
+-   [D] data\volve
+-   [D] data\volve_logs
+-     [D] data\volve\production
+-     [D] data\volve\sorted
+-     [D] data\volve\unsorted
+-       [F] data\volve\production\README.md
+-       [F] data\volve\production\volve_production_data.xlsx
+-       [D] data\volve\sorted\drilling_telemetry
+-       [D] data\volve\unsorted\Norway-NA-15_$47$_9-F-1 time
+-       [D] data\volve\unsorted\Norway-NA-15_$47$_9-F-9 A depth
+-       [D] data\volve\unsorted\Norway-NA-15_$47$_9-F-9 A time
+-       [D] data\volve\unsorted\Norway-Statoil-NO 15_$47$_9-F-1 C 0 depth
+-       [D] data\volve\unsorted\Norway-Statoil-NO 15_$47$_9-F-1 C 0 time
+-       [D] data\volve\unsorted\Norway-Statoil-NO 15_$47$_9-F-1 C A depth
+-       [D] data\volve\unsorted\Norway-Statoil-NO 15_$47$_9-F-1 C A time
+-       [D] data\volve\unsorted\Norway-Statoil-NO 15_$47$_9-F-1 C B time
+-       [D] data\volve\unsorted\Norway-Statoil-NO 15_$47$_9-F-1 C C time
+-       [D] data\volve\unsorted\Norway-Statoil-NO 15_$47$_9-F-11 T2 depth
+-       [D] data\volve\unsorted\Norway-StatoilHydro-15_$47$_9-F-10 depth
+-       [D] data\volve\unsorted\Norway-StatoilHydro-15_$47$_9-F-15S depth
+-     [F] data\volve_logs\ARES1_READY_README.md
+-     [F] data\volve_logs\volve_drilling_ares1_ready.csv
+-     [F] data\volve_logs\volve_drilling_best.csv
+-     [F] data\volve_logs\volve_drilling_best_wide.csv
+-   [D] docs\architecture
+-   [D] docs\grounding
+-   [D] docs\runbooks
+-   [F] docs\dataset_health_report.md
+-   [F] docs\dataset_quick_stats.json
+-   [F] docs\dataset_usage_plan.md
+-   [F] docs\planned_data_flow.md
+-     [F] docs\architecture\physics_baseline.md
+-     [F] docs\architecture\system_overview.md
+-     [F] docs\grounding\well_plan_grounding.md
+-   [D] learning_notes\architecture
+-   [D] learning_notes\references
+-     [F] learning_notes\architecture\ares1_system_map.md
+-     [D] learning_notes\references\components
+-     [D] learning_notes\references\drilling_assembly
+-     [D] learning_notes\references\fluids_mud_system
+-     [D] learning_notes\references\iot_digital_props
+-     [D] learning_notes\references\rig
+-     [D] learning_notes\references\terrain
+-     [D] learning_notes\references\well_control
+-     [D] learning_notes\references\_integrated
+-     [D] learning_notes\references\_review_delete
+-     [F] learning_notes\references\organization_log.md
+-     [F] learning_notes\references\README.md
+-     [F] learning_notes\references\terrain_and_rig_modelling.md
+-       [D] learning_notes\references\drilling_assembly\bits
+-       [D] learning_notes\references\drilling_assembly\drill_string_components
+-       [D] learning_notes\references\drilling_assembly\wellbore_casing_trajectory
+-       [D] learning_notes\references\fluids_mud_system\tanks_shakers_pumps
+-       [D] learning_notes\references\iot_digital_props\sensors_gateways
+-       [D] learning_notes\references\rig\hoisting_system
+-       [D] learning_notes\references\rig\rig_superstructure
+-       [D] learning_notes\references\rig\rotary_system
+-       [D] learning_notes\references\terrain\salt_zone_closeups
+-       [D] learning_notes\references\terrain\subsurface_cross_sections
+-       [D] learning_notes\references\terrain\surface_pad_site
+-       [D] learning_notes\references\well_control\wellhead_bop
+-       [D] learning_notes\references\_integrated\full_scene
+-   [F] mqtt\docker-compose.yml
+-   [F] mqtt\mosquitto.conf
+-   [F] mqtt\README.md
+-   [D] notebooklm_pack\agents
+-   [D] notebooklm_pack\data
+-   [D] notebooklm_pack\docs
+-   [D] notebooklm_pack\python
+-   [D] notebooklm_pack\scripts
+-   [F] notebooklm_pack\FLOW_ANCHOR.md
+-   [F] notebooklm_pack\MANIFEST.json
+-   [F] notebooklm_pack\PROJECT_STAGE_SUMMARY.md
+-   [F] notebooklm_pack\README.md
+-   [F] notebooklm_pack\UPLOAD_CHECKLIST.md
+-     [D] notebooklm_pack\agents\context
+-       [F] notebooklm_pack\agents\context\mission_context.md
+-     [D] notebooklm_pack\data\volve_logs
+-       [F] notebooklm_pack\data\volve_logs\ARES1_READY_README.md
+-     [D] notebooklm_pack\docs\architecture
+-     [F] notebooklm_pack\docs\dataset_health_report.md
+-     [F] notebooklm_pack\docs\dataset_quick_stats.json
+-     [F] notebooklm_pack\docs\dataset_usage_plan.md
+-     [F] notebooklm_pack\docs\planned_data_flow.md
+-       [F] notebooklm_pack\docs\architecture\system_overview.md
+-     [D] notebooklm_pack\python\scripts
+-       [F] notebooklm_pack\python\scripts\ares_karoo_publisher.py
+-     [F] notebooklm_pack\scripts\analyze_volve_dataset_health.py
+-   [D] python\ares1
+-   [D] python\scripts
+-   [D] python\tests
+-   [F] python\pyproject.toml
+-   [F] python\README.md
+-   [F] python\requirements-dev.txt
+-   [F] python\requirements.txt
+-     [D] python\ares1\ml
+-     [D] python\ares1\physics
+-     [D] python\ares1\telemetry
+-     [D] python\ares1\utils
+-     [F] python\ares1\__init__.py
+-       [F] python\ares1\ml\anomaly.py
+-       [F] python\ares1\ml\__init__.py
+-       [F] python\ares1\physics\torque_drag.py
+-       [F] python\ares1\physics\__init__.py
+-       [F] python\ares1\telemetry\__init__.py
+-       [F] python\ares1\utils\__init__.py
+-     [F] python\scripts\ares_karoo_publisher.py
+-     [F] python\scripts\ares_volve_publisher.py
+-     [F] python\scripts\inspect_volve_production_xlsx.py
+-     [F] python\scripts\publish_telemetry.py
+-     [F] python\scripts\run_anomaly_detector.py
+-     [F] python\scripts\subscribe_events.py
+-     [F] python\scripts\subscribe_telemetry.py
+-     [F] python\tests\conftest.py
+-     [F] python\tests\test_anomaly_logic.py
+-     [F] python\tests\test_torque_drag.py
+-   [D] scripts\volve_sort_and_extract
+-   [F] scripts\analyze_volve_dataset_health.py
+-   [D] unity\ares1_unity_project
+-   [D] unity\Assets
+-   [F] unity\README.md
+-     [D] unity\ares1_unity_project\Ares-1
+-       [D] unity\ares1_unity_project\Ares-1\Assets
+-       [D] unity\ares1_unity_project\Ares-1\Packages
+-       [D] unity\ares1_unity_project\Ares-1\ProjectSettings
+-     [D] unity\Assets\Ares1
+-     [F] unity\Assets\ares_terrain.blend
+-     [F] unity\Assets\ares_terrain.blend1
+-       [D] unity\Assets\Ares1\Scripts
+#### C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1
+#### C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\\ares_1
+
+## C) Unique Files to Preserve (source -> destination)
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Scripts\IoT\M2Mqtt.Net.dll -> C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Scripts\IoT\M2Mqtt.Net.dll
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Scripts\IoT\M2Mqtt.Net.dll.meta -> C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Scripts\IoT\M2Mqtt.Net.dll.meta
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\Assets\Scripts\IoT\MqttCompileSmokeTest.cs -> C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\Assets\Scripts\IoT\MqttCompileSmokeTest.cs
+
+## D) Conflicts (source differs from ROOT)
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\.gitignore
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\.gitignore
+  - SRC size/time: 547 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 565 bytes / 2026-01-26 11:48:51 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\.vscode\launch.json
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\.vscode\launch.json
+  - SRC size/time: 1264 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 1224 bytes / 2026-01-16 15:36:52 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\.vscode\settings.json
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\.vscode\settings.json
+  - SRC size/time: 420 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 408 bytes / 2026-01-16 15:33:52 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\.vscode\tasks.json
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\.vscode\tasks.json
+  - SRC size/time: 1722 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 1655 bytes / 2026-01-16 15:34:20 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\agents\context\mission_context.md
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\agents\context\mission_context.md
+  - SRC size/time: 1056 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 1013 bytes / 2026-01-16 15:33:00 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\docs\architecture\physics_baseline.md
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\docs\architecture\physics_baseline.md
+  - SRC size/time: 971 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 940 bytes / 2026-01-16 15:32:31 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\docs\architecture\system_overview.md
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\docs\architecture\system_overview.md
+  - SRC size/time: 1525 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 1497 bytes / 2026-01-16 15:32:41 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\docs\dataset_health_report.md
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\docs\dataset_health_report.md
+  - SRC size/time: 5340 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 5741 bytes / 2026-01-26 11:36:54 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\docs\dataset_usage_plan.md
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\docs\dataset_usage_plan.md
+  - SRC size/time: 2083 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 2233 bytes / 2026-01-26 11:35:45 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\docs\grounding\well_plan_grounding.md
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\docs\grounding\well_plan_grounding.md
+  - SRC size/time: 1212 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 1156 bytes / 2026-01-16 15:32:51 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\docs\planned_data_flow.md
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\docs\planned_data_flow.md
+  - SRC size/time: 3255 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 3318 bytes / 2026-01-26 11:35:56 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\mqtt\docker-compose.yml
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\mqtt\docker-compose.yml
+  - SRC size/time: 365 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 351 bytes / 2026-01-16 15:33:06 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\mqtt\mosquitto.conf
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\mqtt\mosquitto.conf
+  - SRC size/time: 211 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 201 bytes / 2026-01-16 15:33:11 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\mqtt\README.md
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\mqtt\README.md
+  - SRC size/time: 234 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 218 bytes / 2026-01-16 15:33:16 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\python\ares1\__init__.py
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\python\ares1\__init__.py
+  - SRC size/time: 74 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 73 bytes / 2026-01-16 15:30:17 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\python\ares1\ml\anomaly.py
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\python\ares1\ml\anomaly.py
+  - SRC size/time: 6068 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 5879 bytes / 2026-01-16 15:31:06 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\python\ares1\physics\torque_drag.py
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\python\ares1\physics\torque_drag.py
+  - SRC size/time: 988 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 958 bytes / 2026-01-16 15:30:35 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\python\pyproject.toml
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\python\pyproject.toml
+  - SRC size/time: 390 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 371 bytes / 2026-01-16 15:30:07 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\python\README.md
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\python\README.md
+  - SRC size/time: 599 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 573 bytes / 2026-01-16 15:30:13 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\python\requirements-dev.txt
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\python\requirements-dev.txt
+  - SRC size/time: 48 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 45 bytes / 2026-01-16 15:30:01 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\python\scripts\ares_volve_publisher.py
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\python\scripts\ares_volve_publisher.py
+  - SRC size/time: 1278 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 1272 bytes / 2026-01-21 11:27:56 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\python\scripts\inspect_volve_production_xlsx.py
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\python\scripts\inspect_volve_production_xlsx.py
+  - SRC size/time: 2013 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 1950 bytes / 2026-01-17 13:07:28 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\python\scripts\publish_telemetry.py
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\python\scripts\publish_telemetry.py
+  - SRC size/time: 5578 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 5410 bytes / 2026-01-16 15:36:13 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\python\scripts\run_anomaly_detector.py
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\python\scripts\run_anomaly_detector.py
+  - SRC size/time: 415 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 395 bytes / 2026-01-16 15:36:43 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\python\scripts\subscribe_events.py
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\python\scripts\subscribe_events.py
+  - SRC size/time: 2359 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 2285 bytes / 2026-01-16 15:32:22 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\python\scripts\subscribe_telemetry.py
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\python\scripts\subscribe_telemetry.py
+  - SRC size/time: 2772 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 2681 bytes / 2026-01-16 15:36:24 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\python\tests\conftest.py
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\python\tests\conftest.py
+  - SRC size/time: 192 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 186 bytes / 2026-01-16 15:37:43 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\python\tests\test_anomaly_logic.py
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\python\tests\test_anomaly_logic.py
+  - SRC size/time: 456 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 444 bytes / 2026-01-16 15:34:54 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\python\tests\test_torque_drag.py
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\python\tests\test_torque_drag.py
+  - SRC size/time: 529 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 516 bytes / 2026-01-16 15:34:46 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\README.md
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\README.md
+  - SRC size/time: 2044 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 1976 bytes / 2026-01-16 15:36:47 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\scripts\analyze_volve_dataset_health.py
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\scripts\analyze_volve_dataset_health.py
+  - SRC size/time: 19923 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 19890 bytes / 2026-01-26 11:35:06 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Art.meta
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Art.meta
+  - SRC size/time: 180 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 172 bytes / 2026-01-25 05:51:20 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Art\Blender.meta
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Art\Blender.meta
+  - SRC size/time: 180 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 172 bytes / 2026-01-25 05:51:27 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Art\Blender\ares_terrain.blend.meta
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Art\Blender\ares_terrain.blend.meta
+  - SRC size/time: 2971 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 2861 bytes / 2026-01-25 05:52:08 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Plugins.meta
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Plugins.meta
+  - SRC size/time: 180 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 172 bytes / 2026-01-25 05:49:19 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Scenes.meta
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Scenes.meta
+  - SRC size/time: 180 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 172 bytes / 2026-01-25 05:49:10 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Scenes\Main Scene.unity
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Scenes\Main Scene.unity
+  - SRC size/time: 11001 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 12120 bytes / 2026-01-26 16:48:09 UTC
+  - Recommendation: prefer ROOT (newer) but keep SRC with suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Scenes\Main Scene.unity.meta
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Scenes\Main Scene.unity.meta
+  - SRC size/time: 162 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 155 bytes / 2026-01-25 05:50:48 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Scripts.meta
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Scripts.meta
+  - SRC size/time: 180 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 172 bytes / 2026-01-25 05:49:25 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Scripts\IoT.meta
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Scripts\IoT.meta
+  - SRC size/time: 180 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 172 bytes / 2026-01-25 05:49:33 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Scripts\IoT\MqttCompileSmokeTest.cs
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Scripts\IoT\MqttCompileSmokeTest.cs
+  - SRC size/time: 149 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 142 bytes / 2026-01-26 16:37:02 UTC
+  - Recommendation: prefer ROOT (newer) but keep SRC with suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Scripts\IoT\MqttCompileSmokeTest.cs.meta
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Scripts\IoT\MqttCompileSmokeTest.cs.meta
+  - SRC size/time: 60 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 59 bytes / 2026-01-25 20:12:32 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\Packages\manifest.json
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\Packages\manifest.json
+  - SRC size/time: 1549 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 1512 bytes / 2026-01-25 05:47:14 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\Packages\packages-lock.json
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\Packages\packages-lock.json
+  - SRC size/time: 7217 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 6948 bytes / 2026-01-25 05:47:15 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\AudioManager.asset
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\AudioManager.asset
+  - SRC size/time: 463 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 443 bytes / 2026-01-25 05:46:47 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\ClusterInputManager.asset
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\ClusterInputManager.asset
+  - SRC size/time: 120 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 114 bytes / 2026-01-25 05:46:48 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\DynamicsManager.asset
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\DynamicsManager.asset
+  - SRC size/time: 1359 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 1322 bytes / 2026-01-25 05:46:48 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\EditorBuildSettings.asset
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\EditorBuildSettings.asset
+  - SRC size/time: 199 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 190 bytes / 2026-01-25 05:46:48 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\EditorSettings.asset
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\EditorSettings.asset
+  - SRC size/time: 1653 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 1603 bytes / 2026-01-25 05:46:48 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\GraphicsSettings.asset
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\GraphicsSettings.asset
+  - SRC size/time: 2438 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 2372 bytes / 2026-01-25 05:47:13 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\InputManager.asset
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\InputManager.asset
+  - SRC size/time: 6112 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 5816 bytes / 2026-01-25 05:46:47 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\MemorySettings.asset
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\MemorySettings.asset
+  - SRC size/time: 1227 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 1192 bytes / 2026-01-25 05:46:48 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\MultiplayerManager.asset
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\MultiplayerManager.asset
+  - SRC size/time: 164 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 157 bytes / 2026-01-25 05:46:48 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\NavMeshAreas.asset
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\NavMeshAreas.asset
+  - SRC size/time: 1454 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 1361 bytes / 2026-01-25 05:46:48 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\PackageManagerSettings.asset
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\PackageManagerSettings.asset
+  - SRC size/time: 1169 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 1129 bytes / 2026-01-25 05:47:36 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\Physics2DSettings.asset
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\Physics2DSettings.asset
+  - SRC size/time: 1876 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 1820 bytes / 2026-01-25 05:46:48 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\PresetManager.asset
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\PresetManager.asset
+  - SRC size/time: 153 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 146 bytes / 2026-01-25 05:46:48 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\ProjectSettings.asset
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\ProjectSettings.asset
+  - SRC size/time: 22714 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 21929 bytes / 2026-01-26 16:48:09 UTC
+  - Recommendation: prefer ROOT (newer) but keep SRC with suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\ProjectVersion.txt
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\ProjectVersion.txt
+  - SRC size/time: 85 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 83 bytes / 2026-01-25 05:47:31 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\QualitySettings.asset
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\QualitySettings.asset
+  - SRC size/time: 10143 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 9796 bytes / 2026-01-25 05:46:48 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\SceneTemplateSettings.json
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\SceneTemplateSettings.json
+  - SRC size/time: 3655 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 3535 bytes / 2026-01-25 20:12:50 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\TagManager.asset
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\TagManager.asset
+  - SRC size/time: 456 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 411 bytes / 2026-01-25 05:46:47 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\TimeManager.asset
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\TimeManager.asset
+  - SRC size/time: 319 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 305 bytes / 2026-01-25 05:46:47 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\UnityConnectSettings.asset
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\UnityConnectSettings.asset
+  - SRC size/time: 1103 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 1063 bytes / 2026-01-25 05:46:48 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\VersionControlSettings.asset
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\VersionControlSettings.asset
+  - SRC size/time: 179 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 172 bytes / 2026-01-25 05:46:48 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\VFXManager.asset
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\ares1_unity_project\Ares-1\ProjectSettings\VFXManager.asset
+  - SRC size/time: 545 bytes / 2026-01-26 11:54:38 UTC
+  - DST size/time: 525 bytes / 2026-01-25 05:46:48 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\Assets\Ares1\Scripts\MqttTopicMap.cs
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\Assets\Ares1\Scripts\MqttTopicMap.cs
+  - SRC size/time: 566 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 554 bytes / 2026-01-16 15:33:31 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\Assets\Ares1\Scripts\README_UnityBridge.md
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\Assets\Ares1\Scripts\README_UnityBridge.md
+  - SRC size/time: 512 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 498 bytes / 2026-01-16 15:33:43 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\Assets\Ares1\Scripts\TelemetryMessage.cs
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\Assets\Ares1\Scripts\TelemetryMessage.cs
+  - SRC size/time: 232 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 220 bytes / 2026-01-16 15:33:37 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\README.md
+  - ROOT: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\unity\README.md
+  - SRC size/time: 221 bytes / 2026-01-24 18:50:43 UTC
+  - DST size/time: 217 bytes / 2026-01-16 15:33:22 UTC
+  - Recommendation: prefer SRC (newer) but keep both by suffix (_FROM_NESTED_YYYYMMDD).
+
+## E) Duplicates Safe to Delete (after verification)
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\docs\dataset_quick_stats.json
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\python\ares1\ml\__init__.py
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\python\ares1\physics\__init__.py
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\python\ares1\telemetry\__init__.py
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\python\ares1\utils\__init__.py
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\python\requirements.txt
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\python\scripts\ares_karoo_publisher.py
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\ares1_unity_project\Ares-1\Assets\Art\Blender\ares_terrain.blend
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\Assets\ares_terrain.blend
+- C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\ares_1\unity\Assets\ares_terrain.blend1
+
+## F) Final Cleanup Actions (after verification)
+- Backup location: C:\Users\nkany\OneDrive\Desktop\Projects\Ares 1\ares_1\_rescue_nested_backup\\20260126_1929
+- Copy unique + conflict files into ROOT (no overwrites; conflicts kept with suffix).
+- After verification, delete redundant folders (commands provided separately).
