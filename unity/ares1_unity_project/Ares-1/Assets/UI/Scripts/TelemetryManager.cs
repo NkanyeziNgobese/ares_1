@@ -29,6 +29,15 @@ public class TelemetryManager : MonoBehaviour
     [Header("Right Track (Scrolling Geology)")]
     [SerializeField] private StratigraphyTrack stratigraphyTrack;
 
+    // IMPORTANT UI NOTE (TW_ROP):
+    // Ensure sibling order so TMP text stays on top:
+    //   1) RopFill (Image) first
+    //   2) Content (TMP container) last
+    // Optional: lower RopFill alpha or add padding to Content.
+    [Header("Gauges (Image Fill)")]
+    [SerializeField] private TelemetryFillGauge ropGauge;
+    [SerializeField] private float ropMax = 60f;
+
     [Header("Units / Formatting")]
     [SerializeField] private string depthUnit = "m";
     [SerializeField] private string ropUnit = "m/hr";
@@ -55,6 +64,17 @@ public class TelemetryManager : MonoBehaviour
         // Guard: Try to auto-find widgets by name if unassigned (helpful early on)
         // This is optional safety, not required for production.
         TryAutoWireIfMissing();
+
+        if (!ropGauge)
+        {
+            var twRop = GameObject.Find("TW_ROP");
+            if (twRop)
+            {
+                Debug.LogWarning(
+                    "ROP gauge not wired. Assign TelemetryFillGauge (RopFill) to TelemetryManager. Ensure TW_ROP contains RopFill Image.",
+                    this);
+            }
+        }
     }
 
     private void Update()
@@ -87,6 +107,12 @@ public class TelemetryManager : MonoBehaviour
         if (flowInWidget) flowInWidget.SetValue($"{t.flowIn:0.0} {flowUnit}");
         if (flowOutWidget)flowOutWidget.SetValue($"{t.flowOut:0.0} {flowUnit}");
 
+        if (ropGauge)
+        {
+            ropGauge.SetMax(ropMax);
+            ropGauge.SetValue(t.rop);
+        }
+
         if (stratigraphyTrack) stratigraphyTrack.SetDepth(t.depth);
     }
 
@@ -99,7 +125,7 @@ public class TelemetryManager : MonoBehaviour
     private void TryAutoWireIfMissing()
     {
         // Only attempt in Editor, only if missing refs
-        if (depthWidget && ropWidget && wobWidget && rpmWidget && torqueWidget && flowInWidget && flowOutWidget)
+        if (depthWidget && ropWidget && wobWidget && rpmWidget && torqueWidget && flowInWidget && flowOutWidget && ropGauge)
             return;
 
         // Find by exact names you used in the scene
@@ -110,6 +136,23 @@ public class TelemetryManager : MonoBehaviour
         torqueWidget ??= FindWidget("TW_Torque");
         flowInWidget ??= FindWidget("TW_FlowIn");
         flowOutWidget??= FindWidget("TW_FlowOut");
+
+        if (!ropGauge)
+        {
+            var ropFill = GameObject.Find("RopFill");
+            if (ropFill)
+            {
+                ropGauge = ropFill.GetComponent<TelemetryFillGauge>();
+            }
+            else
+            {
+                var ropRoot = GameObject.Find("TW_ROP");
+                if (ropRoot)
+                {
+                    ropGauge = ropRoot.GetComponentInChildren<TelemetryFillGauge>(true);
+                }
+            }
+        }
 
         // Stratigraphy
         if (!stratigraphyTrack)
