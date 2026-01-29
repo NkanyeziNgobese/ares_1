@@ -18,6 +18,23 @@ public class UiSparkline : MaskableGraphic
         SetVerticesDirty();
     }
 
+    [ContextMenu("DEV: Fill With Test Wave")]
+    private void DevFillWave()
+    {
+        for (int i = 0; i < 40; i++)
+        {
+            float v = 0.5f + 0.35f * Mathf.Sin(i * 0.35f);
+            PushSample01(v);
+        }
+    }
+
+    [ContextMenu("DEV: Clear Samples")]
+    private void DevClear()
+    {
+        _samples.Clear();
+        SetVerticesDirty();
+    }
+
     protected override void OnPopulateMesh(VertexHelper vh)
     {
         vh.Clear();
