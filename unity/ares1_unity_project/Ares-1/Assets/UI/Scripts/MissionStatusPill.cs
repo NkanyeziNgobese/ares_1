@@ -19,6 +19,9 @@ public class MissionStatusPill : MonoBehaviour
     [SerializeField] private Image pillBackground;
     [SerializeField] private TMP_Text pillText;
 
+    [Header("Telemetry")]
+    [SerializeField] private TelemetryManager telemetryManager;
+
     [Header("Gauges to watch")]
     [SerializeField] private List<TelemetryFillGauge> gauges = new List<TelemetryFillGauge>();
 
@@ -31,16 +34,35 @@ public class MissionStatusPill : MonoBehaviour
     {
         if (!pillBackground) pillBackground = GetComponent<Image>();
         if (!pillText) pillText = GetComponentInChildren<TMP_Text>(true);
+        if (!telemetryManager) telemetryManager = FindFirstObjectByType<TelemetryManager>();
     }
 
     private void OnValidate()
     {
         if (!pillBackground) pillBackground = GetComponent<Image>();
         if (!pillText) pillText = GetComponentInChildren<TMP_Text>(true);
+        if (!telemetryManager) telemetryManager = FindFirstObjectByType<TelemetryManager>();
     }
 
     private void Update()
     {
+        if (telemetryManager)
+        {
+            if (telemetryManager.IsDisconnected)
+            {
+                if (pillBackground) pillBackground.color = dangerColor;
+                if (pillText) pillText.text = "DISCONNECTED";
+                return;
+            }
+
+            if (telemetryManager.IsStale)
+            {
+                if (pillBackground) pillBackground.color = warningColor;
+                if (pillText) pillText.text = "STALE";
+                return;
+            }
+        }
+
         var level = ComputeWorstLevel();
 
         if (pillBackground)
