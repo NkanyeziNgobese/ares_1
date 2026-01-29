@@ -60,6 +60,18 @@ public class TelemetryManager : MonoBehaviour
     [SerializeField] private float flowDeltaWarning = 25f;
     [SerializeField] private float flowDeltaDanger = 60f;
 
+    [Header("Data Freshness")]
+    [SerializeField] private float staleAfterSeconds = 1.0f;
+    [SerializeField] private float disconnectedAfterSeconds = 3.0f;
+
+    public float SecondsSinceLastPacket { get; private set; } = float.PositiveInfinity;
+    public bool IsStale => SecondsSinceLastPacket >= staleAfterSeconds;
+    public bool IsDisconnected => SecondsSinceLastPacket >= disconnectedAfterSeconds;
+
+    [Header("Telemetry Rate")]
+    [SerializeField] private float hzSmoothing = 0.2f;
+    public float RxHz { get; private set; }
+
     [Header("Units / Formatting")]
     [SerializeField] private string depthUnit = "m";
     [SerializeField] private string ropUnit = "m/hr";
@@ -70,6 +82,8 @@ public class TelemetryManager : MonoBehaviour
 
     // Thread-safe queue in case your receiver runs on another thread
     private readonly ConcurrentQueue<string> _jsonQueue = new ConcurrentQueue<string>();
+    private int _packetsThisWindow = 0;
+    private float _hzWindowTimer = 0f;
 
     /// <summary>
     /// Call this from your Python receiver whenever JSON arrives.
@@ -86,6 +100,8 @@ public class TelemetryManager : MonoBehaviour
         // Guard: Try to auto-find widgets by name if unassigned (helpful early on)
         // This is optional safety, not required for production.
         TryAutoWireIfMissing();
+
+        if (hzSmoothing <= 0f) hzSmoothing = 0.2f;
 
         if (!ropGauge)
         {
@@ -156,21 +172,35 @@ public class TelemetryManager : MonoBehaviour
 
     private void Update()
     {
+        SecondsSinceLastPacket += Time.deltaTime;
+        _hzWindowTimer += Time.deltaTime;
+
         // Keep only the latest packet each frame (real-time telemetry pattern)
         string json = null;
         while (_jsonQueue.TryDequeue(out var next))
             json = next;
 
-        if (json == null) return;
+        if (json != null)
+        {
+            SecondsSinceLastPacket = 0f;
+            _packetsThisWindow++;
 
-        try
-        {
-            var t = JsonUtility.FromJson<TelemetryPayload>(json);
-            Apply(t);
+            try
+            {
+                var t = JsonUtility.FromJson<TelemetryPayload>(json);
+                Apply(t);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Telemetry JSON parse failed: {e.Message}\n{json}");
+            }
         }
-        catch (Exception e)
+
+        if (_hzWindowTimer >= hzSmoothing)
         {
-            Debug.LogWarning($"Telemetry JSON parse failed: {e.Message}\n{json}");
+            RxHz = _packetsThisWindow / _hzWindowTimer;
+            _packetsThisWindow = 0;
+            _hzWindowTimer = 0f;
         }
     }
 
