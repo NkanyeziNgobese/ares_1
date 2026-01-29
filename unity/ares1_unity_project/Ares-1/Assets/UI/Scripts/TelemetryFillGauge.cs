@@ -4,6 +4,8 @@ using UnityEngine.UI;
 [DisallowMultipleComponent]
 public class TelemetryFillGauge : MonoBehaviour
 {
+    public enum Level { Safe = 0, Warning = 1, Danger = 2 }
+
     [SerializeField] private Image fillImage;
 
     [Tooltip("Value corresponding to fillAmount = 1.0")]
@@ -21,17 +23,25 @@ public class TelemetryFillGauge : MonoBehaviour
     [SerializeField] private Color32 warningColor = new Color32(0xFF, 0xB0, 0x00, 0xFF);
     [SerializeField] private Color32 dangerColor = new Color32(0xFF, 0x3B, 0x30, 0xFF);
 
+    public Level CurrentLevel { get; private set; } = Level.Safe;
+
     private float targetFill;
-    private bool alertOverride;
-    private bool alertDanger;
+    private bool alertOverrideEnabled;
+    private bool alertOverrideDanger;
 
     public void SetMax(float max) => maxValue = Mathf.Max(0.0001f, max);
 
     public void SetValue(float value)
     {
         if (!fillImage) return;
+
         targetFill = Mathf.Clamp01(value / maxValue);
-        ApplyColor(targetFill);
+        CurrentLevel = EvaluateLevel(targetFill);
+
+        if (alertOverrideEnabled)
+            CurrentLevel = alertOverrideDanger ? Level.Danger : Level.Warning;
+
+        ApplyColorFromState();
 
         if (lerpSpeed <= 0f)
             fillImage.fillAmount = targetFill;
@@ -39,10 +49,19 @@ public class TelemetryFillGauge : MonoBehaviour
 
     public void SetAlertOverride(bool enabled, bool danger)
     {
-        alertOverride = enabled;
-        alertDanger = danger;
-        if (!fillImage) return;
-        ApplyColor(targetFill);
+        alertOverrideEnabled = enabled;
+        alertOverrideDanger = danger;
+
+        if (enabled)
+        {
+            CurrentLevel = danger ? Level.Danger : Level.Warning;
+        }
+        else
+        {
+            CurrentLevel = EvaluateLevel(targetFill);
+        }
+
+        ApplyColorFromState();
     }
 
     private void Update()
@@ -56,28 +75,36 @@ public class TelemetryFillGauge : MonoBehaviour
         fillImage.fillAmount = Mathf.Lerp(current, targetFill, Time.deltaTime * lerpSpeed);
     }
 
-    private void ApplyColor(float fillFraction)
+    private Level EvaluateLevel(float fillFraction)
+    {
+        if (fillFraction >= dangerAt) return Level.Danger;
+        if (fillFraction >= warningAt) return Level.Warning;
+        return Level.Safe;
+    }
+
+    private void ApplyColorFromState()
     {
         if (!fillImage) return;
 
-        if (alertOverride)
+        if (alertOverrideEnabled)
         {
-            fillImage.color = alertDanger ? dangerColor : warningColor;
+            fillImage.color = alertOverrideDanger ? dangerColor : warningColor;
             return;
         }
 
-        if (fillFraction >= dangerAt)
-            fillImage.color = dangerColor;
-        else if (fillFraction >= warningAt)
-            fillImage.color = warningColor;
-        else
-            fillImage.color = safeColor;
+        fillImage.color = CurrentLevel switch
+        {
+            Level.Danger => dangerColor,
+            Level.Warning => warningColor,
+            _ => safeColor
+        };
     }
 
     private void Reset()
     {
         if (!fillImage) fillImage = GetComponent<Image>();
         targetFill = fillImage ? Mathf.Clamp01(fillImage.fillAmount) : 0f;
+        CurrentLevel = EvaluateLevel(targetFill);
     }
 
     private void OnValidate()
@@ -90,5 +117,8 @@ public class TelemetryFillGauge : MonoBehaviour
         if (dangerAt < warningAt) dangerAt = warningAt;
 
         if (fillImage) targetFill = Mathf.Clamp01(fillImage.fillAmount);
+        CurrentLevel = alertOverrideEnabled
+            ? (alertOverrideDanger ? Level.Danger : Level.Warning)
+            : EvaluateLevel(targetFill);
     }
 }

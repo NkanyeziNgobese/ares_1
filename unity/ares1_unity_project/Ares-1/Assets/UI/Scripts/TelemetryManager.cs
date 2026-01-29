@@ -48,6 +48,9 @@ public class TelemetryManager : MonoBehaviour
     [SerializeField] private TelemetryFillGauge flowOutGauge;
     [SerializeField] private float flowOutMax = 1200f;
 
+    [Header("Sparklines")]
+    [SerializeField] private UiSparkline ropSparkline;
+
     [Header("Flow Imbalance Alert")]
     [SerializeField] private float flowDeltaWarning = 25f;
     [SerializeField] private float flowDeltaDanger = 60f;
@@ -182,6 +185,12 @@ public class TelemetryManager : MonoBehaviour
             ropGauge.SetValue(t.rop);
         }
 
+        if (ropSparkline)
+        {
+            float denom = Mathf.Max(0.0001f, ropMax);
+            ropSparkline.PushSample01(Mathf.Clamp01(t.rop / denom));
+        }
+
         if (wobGauge)
         {
             wobGauge.SetMax(wobMax);
@@ -233,6 +242,18 @@ public class TelemetryManager : MonoBehaviour
     private void Dev_PushSampleJson()
     {
         EnqueueJson("{\"depth\":-1250.5,\"rop\":28.3,\"wob\":14.7,\"rpm\":132,\"torque\":24.9,\"flowIn\":805,\"flowOut\":796}");
+    }
+
+    [ContextMenu("DEV: Push WARNING JSON")]
+    private void Dev_PushWarningJson()
+    {
+        EnqueueJson("{\"depth\":-1400.0,\"rop\":45.0,\"wob\":18.0,\"rpm\":160,\"torque\":38.0,\"flowIn\":900,\"flowOut\":860}");
+    }
+
+    [ContextMenu("DEV: Push DANGER JSON")]
+    private void Dev_PushDangerJson()
+    {
+        EnqueueJson("{\"depth\":-1600.0,\"rop\":58.0,\"wob\":24.0,\"rpm\":195,\"torque\":48.0,\"flowIn\":1000,\"flowOut\":880}");
     }
 
     private void TryAutoWireIfMissing()
@@ -349,6 +370,15 @@ public class TelemetryManager : MonoBehaviour
                 {
                     flowOutGauge = flowOutRoot.GetComponentInChildren<TelemetryFillGauge>(true);
                 }
+            }
+        }
+
+        if (!ropSparkline)
+        {
+            var ropRoot = GameObject.Find("TW_ROP");
+            if (ropRoot)
+            {
+                ropSparkline = ropRoot.GetComponentInChildren<UiSparkline>(true);
             }
         }
 
