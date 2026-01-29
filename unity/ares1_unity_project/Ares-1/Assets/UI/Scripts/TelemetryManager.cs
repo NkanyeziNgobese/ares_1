@@ -50,6 +50,11 @@ public class TelemetryManager : MonoBehaviour
 
     [Header("Sparklines")]
     [SerializeField] private UiSparkline ropSparkline;
+    [SerializeField] private UiSparkline wobSparkline;
+    [SerializeField] private UiSparkline rpmSparkline;
+    [SerializeField] private UiSparkline torqueSparkline;
+    [SerializeField] private UiSparkline flowInSparkline;
+    [SerializeField] private UiSparkline flowOutSparkline;
 
     [Header("Flow Imbalance Alert")]
     [SerializeField] private float flowDeltaWarning = 25f;
@@ -185,12 +190,6 @@ public class TelemetryManager : MonoBehaviour
             ropGauge.SetValue(t.rop);
         }
 
-        if (ropSparkline)
-        {
-            float denom = Mathf.Max(0.0001f, ropMax);
-            ropSparkline.PushSample01(Mathf.Clamp01(t.rop / denom));
-        }
-
         if (wobGauge)
         {
             wobGauge.SetMax(wobMax);
@@ -235,6 +234,13 @@ public class TelemetryManager : MonoBehaviour
             }
         }
 
+        Push01(ropSparkline, t.rop, ropMax);
+        Push01(wobSparkline, t.wob, wobMax);
+        Push01(rpmSparkline, t.rpm, rpmMax);
+        Push01(torqueSparkline, t.torque, torqueMax);
+        Push01(flowInSparkline, t.flowIn, flowInMax);
+        Push01(flowOutSparkline, t.flowOut, flowOutMax);
+
         if (stratigraphyTrack) stratigraphyTrack.SetDepth(t.depth);
     }
 
@@ -256,10 +262,19 @@ public class TelemetryManager : MonoBehaviour
         EnqueueJson("{\"depth\":-1600.0,\"rop\":58.0,\"wob\":24.0,\"rpm\":195,\"torque\":48.0,\"flowIn\":1000,\"flowOut\":880}");
     }
 
+    private static void Push01(UiSparkline s, float value, float max)
+    {
+        if (!s) return;
+        float denom = Mathf.Max(0.0001f, max);
+        s.PushSample01(Mathf.Clamp01(value / denom));
+    }
+
     private void TryAutoWireIfMissing()
     {
         // Only attempt in Editor, only if missing refs
-        if (depthWidget && ropWidget && wobWidget && rpmWidget && torqueWidget && flowInWidget && flowOutWidget && ropGauge && wobGauge && rpmGauge && torqueGauge && flowInGauge && flowOutGauge)
+        if (depthWidget && ropWidget && wobWidget && rpmWidget && torqueWidget && flowInWidget && flowOutWidget
+            && ropGauge && wobGauge && rpmGauge && torqueGauge && flowInGauge && flowOutGauge
+            && ropSparkline && wobSparkline && rpmSparkline && torqueSparkline && flowInSparkline && flowOutSparkline)
             return;
 
         // Find by exact names you used in the scene
@@ -379,6 +394,51 @@ public class TelemetryManager : MonoBehaviour
             if (ropRoot)
             {
                 ropSparkline = ropRoot.GetComponentInChildren<UiSparkline>(true);
+            }
+        }
+
+        if (!wobSparkline)
+        {
+            var wobRoot = GameObject.Find("TW_WOB");
+            if (wobRoot)
+            {
+                wobSparkline = wobRoot.GetComponentInChildren<UiSparkline>(true);
+            }
+        }
+
+        if (!rpmSparkline)
+        {
+            var rpmRoot = GameObject.Find("TW_RPM");
+            if (rpmRoot)
+            {
+                rpmSparkline = rpmRoot.GetComponentInChildren<UiSparkline>(true);
+            }
+        }
+
+        if (!torqueSparkline)
+        {
+            var torqueRoot = GameObject.Find("TW_Torque");
+            if (torqueRoot)
+            {
+                torqueSparkline = torqueRoot.GetComponentInChildren<UiSparkline>(true);
+            }
+        }
+
+        if (!flowInSparkline)
+        {
+            var flowInRoot = GameObject.Find("TW_FlowIn");
+            if (flowInRoot)
+            {
+                flowInSparkline = flowInRoot.GetComponentInChildren<UiSparkline>(true);
+            }
+        }
+
+        if (!flowOutSparkline)
+        {
+            var flowOutRoot = GameObject.Find("TW_FlowOut");
+            if (flowOutRoot)
+            {
+                flowOutSparkline = flowOutRoot.GetComponentInChildren<UiSparkline>(true);
             }
         }
 
