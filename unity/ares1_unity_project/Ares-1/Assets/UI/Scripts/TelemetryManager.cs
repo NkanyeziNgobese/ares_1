@@ -37,6 +37,20 @@ public class TelemetryManager : MonoBehaviour
     [Header("Gauges (Image Fill)")]
     [SerializeField] private TelemetryFillGauge ropGauge;
     [SerializeField] private float ropMax = 60f;
+    [SerializeField] private TelemetryFillGauge wobGauge;
+    [SerializeField] private float wobMax = 25f;
+    [SerializeField] private TelemetryFillGauge rpmGauge;
+    [SerializeField] private float rpmMax = 200f;
+    [SerializeField] private TelemetryFillGauge torqueGauge;
+    [SerializeField] private float torqueMax = 50f;
+    [SerializeField] private TelemetryFillGauge flowInGauge;
+    [SerializeField] private float flowInMax = 1200f;
+    [SerializeField] private TelemetryFillGauge flowOutGauge;
+    [SerializeField] private float flowOutMax = 1200f;
+
+    [Header("Flow Imbalance Alert")]
+    [SerializeField] private float flowDeltaWarning = 25f;
+    [SerializeField] private float flowDeltaDanger = 60f;
 
     [Header("Units / Formatting")]
     [SerializeField] private string depthUnit = "m";
@@ -72,6 +86,61 @@ public class TelemetryManager : MonoBehaviour
             {
                 Debug.LogWarning(
                     "ROP gauge not wired. Assign TelemetryFillGauge (RopFill) to TelemetryManager. Ensure TW_ROP contains RopFill Image.",
+                    this);
+            }
+        }
+
+        if (!wobGauge)
+        {
+            var twWob = GameObject.Find("TW_WOB");
+            if (twWob)
+            {
+                Debug.LogWarning(
+                    "WOB gauge missing. Add child Image 'WobFill' under TW_WOB, attach TelemetryFillGauge, and ensure sibling order: Fill first, Content last.",
+                    this);
+            }
+        }
+
+        if (!rpmGauge)
+        {
+            var twRpm = GameObject.Find("TW_RPM");
+            if (twRpm)
+            {
+                Debug.LogWarning(
+                    "RPM gauge missing. Add child Image 'RpmFill' under TW_RPM, attach TelemetryFillGauge, and ensure sibling order: Fill first, Content last.",
+                    this);
+            }
+        }
+
+        if (!torqueGauge)
+        {
+            var twTorque = GameObject.Find("TW_Torque");
+            if (twTorque)
+            {
+                Debug.LogWarning(
+                    "Torque gauge missing. Add child Image 'TorqueFill' under TW_Torque, attach TelemetryFillGauge, and ensure sibling order: Fill first, Content last.",
+                    this);
+            }
+        }
+
+        if (!flowInGauge)
+        {
+            var twFlowIn = GameObject.Find("TW_FlowIn");
+            if (twFlowIn)
+            {
+                Debug.LogWarning(
+                    "Flow In gauge missing. Add child Image 'FlowInFill' under TW_FlowIn, attach TelemetryFillGauge, and ensure sibling order: Fill first, Content last.",
+                    this);
+            }
+        }
+
+        if (!flowOutGauge)
+        {
+            var twFlowOut = GameObject.Find("TW_FlowOut");
+            if (twFlowOut)
+            {
+                Debug.LogWarning(
+                    "Flow Out gauge missing. Add child Image 'FlowOutFill' under TW_FlowOut, attach TelemetryFillGauge, and ensure sibling order: Fill first, Content last.",
                     this);
             }
         }
@@ -113,6 +182,50 @@ public class TelemetryManager : MonoBehaviour
             ropGauge.SetValue(t.rop);
         }
 
+        if (wobGauge)
+        {
+            wobGauge.SetMax(wobMax);
+            wobGauge.SetValue(t.wob);
+        }
+
+        if (rpmGauge)
+        {
+            rpmGauge.SetMax(rpmMax);
+            rpmGauge.SetValue(t.rpm);
+        }
+
+        if (torqueGauge)
+        {
+            torqueGauge.SetMax(torqueMax);
+            torqueGauge.SetValue(t.torque);
+        }
+
+        if (flowInGauge)
+        {
+            flowInGauge.SetMax(flowInMax);
+            flowInGauge.SetValue(t.flowIn);
+        }
+
+        if (flowOutGauge)
+        {
+            flowOutGauge.SetMax(flowOutMax);
+            flowOutGauge.SetValue(t.flowOut);
+
+            var delta = Mathf.Abs(t.flowIn - t.flowOut);
+            if (delta >= flowDeltaDanger)
+            {
+                flowOutGauge.SetAlertOverride(true, true);
+            }
+            else if (delta >= flowDeltaWarning)
+            {
+                flowOutGauge.SetAlertOverride(true, false);
+            }
+            else
+            {
+                flowOutGauge.SetAlertOverride(false, false);
+            }
+        }
+
         if (stratigraphyTrack) stratigraphyTrack.SetDepth(t.depth);
     }
 
@@ -125,7 +238,7 @@ public class TelemetryManager : MonoBehaviour
     private void TryAutoWireIfMissing()
     {
         // Only attempt in Editor, only if missing refs
-        if (depthWidget && ropWidget && wobWidget && rpmWidget && torqueWidget && flowInWidget && flowOutWidget && ropGauge)
+        if (depthWidget && ropWidget && wobWidget && rpmWidget && torqueWidget && flowInWidget && flowOutWidget && ropGauge && wobGauge && rpmGauge && torqueGauge && flowInGauge && flowOutGauge)
             return;
 
         // Find by exact names you used in the scene
@@ -150,6 +263,91 @@ public class TelemetryManager : MonoBehaviour
                 if (ropRoot)
                 {
                     ropGauge = ropRoot.GetComponentInChildren<TelemetryFillGauge>(true);
+                }
+            }
+        }
+
+        if (!wobGauge)
+        {
+            var wobFill = GameObject.Find("WobFill");
+            if (wobFill)
+            {
+                wobGauge = wobFill.GetComponent<TelemetryFillGauge>();
+            }
+            else
+            {
+                var wobRoot = GameObject.Find("TW_WOB");
+                if (wobRoot)
+                {
+                    wobGauge = wobRoot.GetComponentInChildren<TelemetryFillGauge>(true);
+                }
+            }
+        }
+
+        if (!rpmGauge)
+        {
+            var rpmFill = GameObject.Find("RpmFill");
+            if (rpmFill)
+            {
+                rpmGauge = rpmFill.GetComponent<TelemetryFillGauge>();
+            }
+            else
+            {
+                var rpmRoot = GameObject.Find("TW_RPM");
+                if (rpmRoot)
+                {
+                    rpmGauge = rpmRoot.GetComponentInChildren<TelemetryFillGauge>(true);
+                }
+            }
+        }
+
+        if (!torqueGauge)
+        {
+            var torqueFill = GameObject.Find("TorqueFill");
+            if (torqueFill)
+            {
+                torqueGauge = torqueFill.GetComponent<TelemetryFillGauge>();
+            }
+            else
+            {
+                var torqueRoot = GameObject.Find("TW_Torque");
+                if (torqueRoot)
+                {
+                    torqueGauge = torqueRoot.GetComponentInChildren<TelemetryFillGauge>(true);
+                }
+            }
+        }
+
+        if (!flowInGauge)
+        {
+            var flowInFill = GameObject.Find("FlowInFill");
+            if (flowInFill)
+            {
+                flowInGauge = flowInFill.GetComponent<TelemetryFillGauge>();
+            }
+            else
+            {
+                var flowInRoot = GameObject.Find("TW_FlowIn");
+                if (flowInRoot)
+                {
+                    flowInGauge = flowInRoot.GetComponentInChildren<TelemetryFillGauge>(true);
+                }
+            }
+        }
+
+        if (!flowOutGauge)
+        {
+            var flowOutFill = GameObject.Find("FlowOutFill");
+            if (flowOutFill)
+            {
+                flowOutGauge = flowOutFill.GetComponent<TelemetryFillGauge>();
+            }
+            else
+            {
+                var flowOutRoot = GameObject.Find("TW_FlowOut");
+                if (flowOutRoot)
+                {
+                    flowOutGauge = flowOutRoot.GetComponentInChildren<TelemetryFillGauge>(true);
                 }
             }
         }
