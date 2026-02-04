@@ -9,7 +9,6 @@ public class DepthScaleController : MonoBehaviour
     [SerializeField] private TelemetryManager telemetryManager;
     [SerializeField] private RectTransform scaleRoot;
     [SerializeField] private RectTransform viewport;
-    [SerializeField] private RectTransform content;
     [SerializeField] private RectTransform markerLine;
     [SerializeField] private DepthTickView tickPrefab;
 
@@ -37,21 +36,19 @@ public class DepthScaleController : MonoBehaviour
     private float _lastDepth = float.PositiveInfinity;
     private float _lastMinDepth = float.PositiveInfinity;
     private float _lastMaxDepth = float.PositiveInfinity;
-    private float _lastYCurrent;
+    private float _lastCenterFromTop;
     private bool _warnedZeroHeight;
     private bool _warnedRootNotChild;
     private bool _warnedViewportMissing;
 
     private void Awake()
     {
-        ResolveContent();
         Prewarm();
         SetDebugVisible(debugEnabled);
     }
 
     private void OnValidate()
     {
-        ResolveContent();
         if (minorStepMeters <= 0f) minorStepMeters = 1f;
         if (majorStepMeters < minorStepMeters) majorStepMeters = minorStepMeters;
         if (pixelsPerMeter <= 0f) pixelsPerMeter = 0.1f;
@@ -71,14 +68,14 @@ public class DepthScaleController : MonoBehaviour
             SetDebugVisible(debugEnabled);
         }
 
-        if (!telemetryManager || !content || !tickPrefab) return;
+        if (!telemetryManager || !scaleRoot || !tickPrefab) return;
 
         if (!_warnedRootNotChild)
         {
-            var rootTransform = content.transform;
+            var rootTransform = scaleRoot.transform;
             if (rootTransform != transform && !rootTransform.IsChildOf(transform))
             {
-                Debug.LogWarning("DepthScaleController: content is not a child of this controller. Check wiring to DepthScaleContent.", this);
+                Debug.LogWarning("DepthScaleController: scaleRoot is not a child of this controller. Check wiring to DepthScaleContent.", this);
                 _warnedRootNotChild = true;
             }
         }
@@ -90,16 +87,15 @@ public class DepthScaleController : MonoBehaviour
             _lastDepth = currentDepth;
         }
 
-        UpdateContentPosition(currentDepth);
         UpdateDebug(currentDepth);
     }
 
     private void Prewarm()
     {
-        if (!content || !tickPrefab) return;
+        if (!scaleRoot || !tickPrefab) return;
         for (int i = _pool.Count; i < prewarmTicks; i++)
         {
-            var tick = Instantiate(tickPrefab, content);
+            var tick = Instantiate(tickPrefab, scaleRoot);
             tick.gameObject.SetActive(false);
             _pool.Add(tick);
         }
@@ -116,9 +112,9 @@ public class DepthScaleController : MonoBehaviour
         {
             rawHeight = viewport.rect.height;
         }
-        else if (content)
+        else if (scaleRoot)
         {
-            rawHeight = content.rect.height;
+            rawHeight = scaleRoot.rect.height;
             if (!_warnedViewportMissing)
             {
                 Debug.LogWarning("DepthScaleController: viewport is not assigned; using content height for auto scaling.", this);
@@ -138,6 +134,7 @@ public class DepthScaleController : MonoBehaviour
             pixelsPerMeter = usableHeight / Mathf.Max(1f, 2f * halfWindowMeters);
         }
 
+        _lastCenterFromTop = topInsetPx + usableHeight * 0.5f;
         _lastMinDepth = minDepth;
         _lastMaxDepth = maxDepth;
 
@@ -147,7 +144,7 @@ public class DepthScaleController : MonoBehaviour
         for (float d = start; d <= maxDepth + 0.0001f; d += step)
         {
             var tick = GetTick(activeCount++);
-            ConfigureTick(tick, d, minDepth);
+            ConfigureTick(tick, d, currentDepth);
         }
 
         for (int i = activeCount; i < _pool.Count; i++)
@@ -158,7 +155,7 @@ public class DepthScaleController : MonoBehaviour
     {
         if (index >= _pool.Count)
         {
-            var tick = Instantiate(tickPrefab, content);
+            var tick = Instantiate(tickPrefab, scaleRoot);
             _pool.Add(tick);
         }
 
@@ -167,7 +164,7 @@ public class DepthScaleController : MonoBehaviour
         return t;
     }
 
-    private void ConfigureTick(DepthTickView tick, float depth, float minDepth)
+    private void ConfigureTick(DepthTickView tick, float depth, float currentDepth)
     {
         bool isMajor = IsMajorTick(depth);
         tick.SetMajor(isMajor);
@@ -180,7 +177,10 @@ public class DepthScaleController : MonoBehaviour
         rt.anchorMax = new Vector2(1f, 1f);
         rt.pivot = new Vector2(0.5f, 1f);
 
-        float y = topInsetPx + (depth - minDepth) * pixelsPerMeter;
+        float metersFromMarker = depth - currentDepth;
+        if (invertScroll) metersFromMarker = -metersFromMarker;
+        float yFromMarker = metersFromMarker * pixelsPerMeter;
+        float y = _lastCenterFromTop + yFromMarker;
         rt.anchoredPosition = new Vector2(0f, -y);
     }
 
@@ -191,34 +191,12 @@ public class DepthScaleController : MonoBehaviour
         return remainder < 0.001f || Mathf.Abs(step - remainder) < 0.001f;
     }
 
-    private void UpdateContentPosition(float currentDepth)
-    {
-        if (!content) return;
-        if (float.IsInfinity(_lastMinDepth)) return;
-
-        float yCurrent = topInsetPx + (currentDepth - _lastMinDepth) * pixelsPerMeter;
-        if (invertScroll) yCurrent = -yCurrent;
-        _lastYCurrent = yCurrent;
-
-        float markerY = markerLine ? markerLine.anchoredPosition.y : 0f;
-        var pos = content.anchoredPosition;
-        pos.y = markerY + yCurrent;
-        content.anchoredPosition = pos;
-    }
-
     private void UpdateDebug(float currentDepth)
     {
         if (!debugEnabled || !debugText) return;
 
-        float contentY = content ? content.anchoredPosition.y : 0f;
         debugText.text =
-            $"depth {currentDepth:0.0} | min {(_lastMinDepth):0.0} max {(_lastMaxDepth):0.0} | ppm {pixelsPerMeter:0.###} | yCur {_lastYCurrent:0.0} | contentY {contentY:0.0} | invert {invertScroll}";
-    }
-
-    private void ResolveContent()
-    {
-        if (!content && scaleRoot) content = scaleRoot;
-        if (!scaleRoot && content) scaleRoot = content;
+            $"depth {currentDepth:0.0} | ppm {pixelsPerMeter:0.###} | min {(_lastMinDepth):0.0} max {(_lastMaxDepth):0.0} | center {_lastCenterFromTop:0.0} | invert {invertScroll}";
     }
 
     private void SetDebugVisible(bool visible)
