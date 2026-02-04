@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &3817456305115212508
 RectTransform:
   m_ObjectHideFlags: 0
@@ -297,8 +297,9 @@ GameObject:
   - component: {fileID: 933830052414572793}
   - component: {fileID: 7396660847761595051}
   - component: {fileID: 3711291331820599236}
+  - component: {fileID: 2532410502032100386}
   m_Layer: 5
-  m_Name: DepthTick
+  m_Name: PF_DepthTick
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -364,3 +365,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &2532410502032100386
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6638870081996909832}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb9b4292a8b3c604581b684aa823eb6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DepthTickView
+  tickLine: {fileID: 2718815717791279744}
+  majorLine: {fileID: 7796036260560976633}
+  depthLabel: {fileID: 4945786176513312080}
