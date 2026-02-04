@@ -71,6 +71,7 @@ public class TelemetryManager : MonoBehaviour
     [Header("Telemetry Rate")]
     [SerializeField] private float hzSmoothing = 0.2f;
     public float RxHz { get; private set; }
+    public float CurrentDepth { get; private set; }
 
     [Header("Units / Formatting")]
     [SerializeField] private string depthUnit = "m";
@@ -206,6 +207,8 @@ public class TelemetryManager : MonoBehaviour
 
     private void Apply(TelemetryPayload t)
     {
+        CurrentDepth = t.depth;
+
         if (depthWidget)  depthWidget.SetValue($"{t.depth:0.0} {depthUnit}");
         if (ropWidget)    ropWidget.SetValue($"{t.rop:0.0} {ropUnit}");
         if (wobWidget)    wobWidget.SetValue($"{t.wob:0.0} {wobUnit}");
