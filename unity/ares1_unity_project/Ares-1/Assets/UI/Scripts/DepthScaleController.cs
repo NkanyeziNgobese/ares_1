@@ -69,6 +69,7 @@ public class DepthScaleController : MonoBehaviour
         }
 
         if (!telemetryManager || !scaleRoot || !tickPrefab) return;
+        if (ScrollPauseController.IsPaused) return;
 
         if (!_warnedRootNotChild)
         {
