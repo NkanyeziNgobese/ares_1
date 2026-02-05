@@ -13,10 +13,19 @@ public class ScrollPauseController : MonoBehaviour
     [SerializeField] private KeyCode toggleKey = KeyCode.F7;
     [SerializeField] private bool autoPauseWhenDisconnected = true;
 
+    [Header("Visual Feedback (optional)")]
+    [SerializeField] private bool dimWhenPaused = true;
+    [SerializeField, Range(0.05f, 1f)] private float pausedAlpha = 0.6f;
+
+    [Tooltip("CanvasGroups to dim when visuals are paused (e.g., DepthScaleViewport, StratigraphyViewport).")]
+    [SerializeField] private CanvasGroup[] dimTargets;
+
     [Header("Debug (optional)")]
     [SerializeField] private bool debugEnabled = false;
     [SerializeField] private TMP_Text debugText;
     [SerializeField] private KeyCode debugToggleKey = KeyCode.F8;
+
+    private bool _prevPaused;
 
     private void Reset()
     {
@@ -57,13 +66,39 @@ public class ScrollPauseController : MonoBehaviour
                 telemetryManager.IsDisconnected ? "DISCONNECTED" :
                 telemetryManager.IsStale ? "STALE" : "LIVE";
 
+            string stateLine = IsPaused ? "STATE: VISUALS PAUSED" : "STATE: LIVE VISUALS";
+
             debugText.text =
                 $"[Scroll]\n" +
+                $"{stateLine}\n" +
                 $"Paused: {IsPaused}\n" +
                 $"AutoPauseOnDisc: {autoPauseWhenDisconnected}\n" +
                 $"Freshness: {freshness}\n" +
                 $"F7 Toggle Pause\n" +
                 $"F8 Toggle This HUD";
+        }
+    }
+
+    private void LateUpdate()
+    {
+        if (_prevPaused != IsPaused)
+        {
+            ApplyDimming();
+            _prevPaused = IsPaused;
+        }
+    }
+
+    private void ApplyDimming()
+    {
+        if (dimTargets == null) return;
+
+        float a = (IsPaused && dimWhenPaused) ? pausedAlpha : 1f;
+
+        for (int i = 0; i < dimTargets.Length; i++)
+        {
+            var cg = dimTargets[i];
+            if (!cg) continue;
+            cg.alpha = a;
         }
     }
 }

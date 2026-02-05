@@ -40,6 +40,7 @@ public class DepthScaleController : MonoBehaviour
     private bool _warnedZeroHeight;
     private bool _warnedRootNotChild;
     private bool _warnedViewportMissing;
+    private bool _hasBuiltOnce;
 
     private void Awake()
     {
@@ -68,8 +69,7 @@ public class DepthScaleController : MonoBehaviour
             SetDebugVisible(debugEnabled);
         }
 
-        if (!telemetryManager || !scaleRoot || !tickPrefab) return;
-        if (ScrollPauseController.IsPaused) return;
+        if (!telemetryManager || !scaleRoot || !tickPrefab || !viewport) return;
 
         if (!_warnedRootNotChild)
         {
@@ -81,8 +81,20 @@ public class DepthScaleController : MonoBehaviour
             }
         }
 
+        if (viewport.rect.height < 2f) return;
+
         float currentDepth = telemetryManager.CurrentDepth;
-        if (float.IsInfinity(_lastDepth) || Mathf.Abs(currentDepth - _lastDepth) >= minorStepMeters * 0.25f)
+        if (!_hasBuiltOnce)
+        {
+            Rebuild(currentDepth);
+            _hasBuiltOnce = true;
+            _lastDepth = currentDepth;
+            return;
+        }
+
+        if (ScrollPauseController.IsPaused) return;
+
+        if (Mathf.Abs(currentDepth - _lastDepth) >= minorStepMeters * 0.25f)
         {
             Rebuild(currentDepth);
             _lastDepth = currentDepth;
