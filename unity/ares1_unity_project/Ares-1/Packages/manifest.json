@@ -1,6 +1,9 @@
 {
   "dependencies": {
+<<<<<<< HEAD
     "com.nobi.roundedcorners": "https://github.com/kirevdokimov/Unity-UI-Rounded-Corners.git",
+=======
+>>>>>>> 166b2df92058ed6c3937a4080f723aaaa63f5f19
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.multiplayer.center": "1.0.0",
     "com.unity.ugui": "2.0.0",

@@ -46,7 +46,10 @@ public class StratigraphyScroller : MonoBehaviour
         }
 
         if (!telemetryManager || !rawImage) return;
+<<<<<<< HEAD
         if (ScrollPauseController.IsPaused) return;
+=======
+>>>>>>> 166b2df92058ed6c3937a4080f723aaaa63f5f19
 
         float depth = telemetryManager.CurrentDepth;
 

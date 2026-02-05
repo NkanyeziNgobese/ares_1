@@ -72,7 +72,10 @@ public class TelemetryManager : MonoBehaviour
     [SerializeField] private float hzSmoothing = 0.2f;
     public float RxHz { get; private set; }
     public float CurrentDepth { get; private set; }
+<<<<<<< HEAD
     public float LastSampleAgeSeconds { get; private set; }
+=======
+>>>>>>> 166b2df92058ed6c3937a4080f723aaaa63f5f19
 
     [Header("Units / Formatting")]
     [SerializeField] private string depthUnit = "m";
@@ -174,7 +177,10 @@ public class TelemetryManager : MonoBehaviour
 
     private void Update()
     {
+<<<<<<< HEAD
         LastSampleAgeSeconds += Time.unscaledDeltaTime;
+=======
+>>>>>>> 166b2df92058ed6c3937a4080f723aaaa63f5f19
         SecondsSinceLastPacket += Time.deltaTime;
         _hzWindowTimer += Time.deltaTime;
 
@@ -192,7 +198,10 @@ public class TelemetryManager : MonoBehaviour
             {
                 var t = JsonUtility.FromJson<TelemetryPayload>(json);
                 Apply(t);
+<<<<<<< HEAD
                 LastSampleAgeSeconds = 0f;
+=======
+>>>>>>> 166b2df92058ed6c3937a4080f723aaaa63f5f19
             }
             catch (Exception e)
             {
