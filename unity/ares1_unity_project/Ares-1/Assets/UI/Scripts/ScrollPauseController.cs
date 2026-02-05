@@ -8,6 +8,8 @@ public class ScrollPauseController : MonoBehaviour
 
     [Header("Refs")]
     [SerializeField] private TelemetryManager telemetryManager;
+    [SerializeField] private TMP_Text pauseButtonLabel;
+    [SerializeField] private GameObject pausedBadge;
 
     [Header("Controls")]
     [SerializeField] private KeyCode toggleKey = KeyCode.F7;
@@ -43,6 +45,7 @@ public class ScrollPauseController : MonoBehaviour
         if (Input.GetKeyDown(toggleKey))
         {
             IsPaused = !IsPaused;
+            ApplyUIState();
             Debug.Log($"[ScrollPauseController] IsPaused={IsPaused} (F7)");
         }
 
@@ -54,9 +57,10 @@ public class ScrollPauseController : MonoBehaviour
         }
 
         // Auto pause when disconnected (doesn't auto-unpause; you decide)
-        if (autoPauseWhenDisconnected && telemetryManager != null && telemetryManager.IsDisconnected)
+        if (autoPauseWhenDisconnected && telemetryManager != null && telemetryManager.IsDisconnected && !IsPaused)
         {
             IsPaused = true;
+            ApplyUIState();
         }
 
         if (debugEnabled && debugText)
@@ -81,11 +85,7 @@ public class ScrollPauseController : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (_prevPaused != IsPaused)
-        {
-            ApplyDimming();
-            _prevPaused = IsPaused;
-        }
+        if (_prevPaused != IsPaused) ApplyUIState();
     }
 
     private void ApplyDimming()
@@ -100,5 +100,30 @@ public class ScrollPauseController : MonoBehaviour
             if (!cg) continue;
             cg.alpha = a;
         }
+    }
+
+    public void TogglePauseVisuals()
+    {
+        IsPaused = !IsPaused;
+        ApplyUIState();
+        Debug.Log($"[ScrollPauseController] IsPaused={IsPaused} (UI Button)");
+    }
+
+    public void SetPaused(bool paused)
+    {
+        IsPaused = paused;
+        ApplyUIState();
+    }
+
+    private void ApplyUIState()
+    {
+        if (pauseButtonLabel)
+            pauseButtonLabel.text = IsPaused ? "RESUME VISUALS" : "PAUSE VISUALS";
+
+        if (pausedBadge)
+            pausedBadge.SetActive(IsPaused);
+
+        ApplyDimming();
+        _prevPaused = IsPaused;
     }
 }
