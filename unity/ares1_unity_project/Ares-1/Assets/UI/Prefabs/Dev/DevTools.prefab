@@ -1,0 +1,414 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5200156333976369733
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6791863712683479124}
+  - component: {fileID: 5242066715098476071}
+  - component: {fileID: 586647273203834422}
+  - component: {fileID: 265835104129224473}
+  m_Layer: 0
+  m_Name: DevTools
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6791863712683479124
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5200156333976369733}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1496.304, y: 554.81244, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 6346814033779568352}
+  - {fileID: 830361238340070382}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5242066715098476071
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5200156333976369733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14f0e5e2ff1e2e24c931b2be997bc98d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DevTelemetryDriver
+  telemetryManager: {fileID: 0}
+  toggleKey: 286
+  enabledSim: 0
+  depthRateMps: 1
+  sendInterval: 0.2
+  rop: 40
+  wob: 18
+  rpm: 160
+  torque: 35
+  flowIn: 900
+  flowOut: 870
+--- !u!114 &586647273203834422
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5200156333976369733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f35b9361076cc46ac44929d5faa8cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DirectionProofHUD
+  telemetryManager: {fileID: 0}
+  depthScaleContent: {fileID: 0}
+  stratigraphyRaw: {fileID: 0}
+  hudText: {fileID: 0}
+  toggleKey: 287
+  visible: 0
+--- !u!114 &265835104129224473
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5200156333976369733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f50cffcf3b591c647914e8f8a03ab88c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ScrollPauseController
+  telemetryManager: {fileID: 0}
+  pauseButtonLabel: {fileID: 0}
+  pausedBadge: {fileID: 0}
+  toggleKey: 288
+  autoPauseWhenDisconnected: 1
+  dimWhenPaused: 1
+  pausedAlpha: 0.6
+  dimTargets: []
+  debugEnabled: 0
+  debugText: {fileID: 0}
+  debugToggleKey: 289
+--- !u!1 &5763098723988550054
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6346814033779568352}
+  - component: {fileID: 4078983452204410466}
+  - component: {fileID: 6554393862728340973}
+  - component: {fileID: 3619416095494433744}
+  m_Layer: 0
+  m_Name: AlarmSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6346814033779568352
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5763098723988550054}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6791863712683479124}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4078983452204410466
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5763098723988550054}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8eda609f29f6af842a8a10625cec4a1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TelemetryAlarmApplier
+  telemetryManager: {fileID: 0}
+  useSmoothedValues: 0
+  freezeColorsWhenPaused: 0
+  targets:
+  - key: rop
+    valueText: {fileID: 0}
+    ring: {fileID: 0}
+    rule:
+      key: 
+      enabled: 1
+      useLow: 0
+      useHigh: 1
+      warnHigh: 60
+      dangerHigh: 90
+      warnLow: 0
+      dangerLow: 0
+    displayName: ROP
+  - key: wob
+    valueText: {fileID: 0}
+    ring: {fileID: 0}
+    rule:
+      key: 
+      enabled: 1
+      useLow: 0
+      useHigh: 1
+      warnHigh: 12.2
+      dangerHigh: 18.4
+      warnLow: 0
+      dangerLow: 0
+    displayName: WOB
+  - key: rpm
+    valueText: {fileID: 0}
+    ring: {fileID: 0}
+    rule:
+      key: 
+      enabled: 1
+      useLow: 0
+      useHigh: 1
+      warnHigh: 180
+      dangerHigh: 240
+      warnLow: 0
+      dangerLow: 0
+    displayName: RPM
+  - key: torque
+    valueText: {fileID: 0}
+    ring: {fileID: 0}
+    rule:
+      key: 
+      enabled: 1
+      useLow: 0
+      useHigh: 1
+      warnHigh: 25
+      dangerHigh: 40
+      warnLow: 0
+      dangerLow: 0
+    displayName: TORQUE
+  - key: flowIn
+    valueText: {fileID: 0}
+    ring: {fileID: 0}
+    rule:
+      key: 
+      enabled: 1
+      useLow: 0
+      useHigh: 1
+      warnHigh: 1200
+      dangerHigh: 1600
+      warnLow: 0
+      dangerLow: 0
+    displayName: FLOW IN
+  - key: flowOut
+    valueText: {fileID: 0}
+    ring: {fileID: 0}
+    rule:
+      key: 
+      enabled: 1
+      useLow: 0
+      useHigh: 1
+      warnHigh: 1200
+      dangerHigh: 1600
+      warnLow: 0
+      dangerLow: 0
+    displayName: FLOW OUT
+  safeBlue: {r: 0, g: 0.5803922, b: 1, a: 1}
+  warningAmber: {r: 1, g: 0.7490196, b: 0, a: 1}
+  dangerRed: {r: 1, g: 0.23137255, b: 0.1882353, a: 1}
+  activeAlarmsText: {fileID: 0}
+  showOnlyWarningAndDanger: 1
+  maxLines: 6
+--- !u!82 &6554393862728340973
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5763098723988550054}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: 3ebda5410e20e26489fc59be502c6919, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 0.2
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &3619416095494433744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5763098723988550054}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa0c12df9ce876541ab0a4aedca7bce4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AlarmSoundController
+  alarmApplier: {fileID: 4078983452204410466}
+  audioSource: {fileID: 6554393862728340973}
+  playOnlyOnDanger: 1
+  includeWarning: 0
+  startDelaySeconds: 0
+  stopDelaySeconds: 0.5
+  muteToggleKey: 292
+  muted: 0
+--- !u!1 &6869400033966778325
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 830361238340070382}
+  - component: {fileID: 7040887272927529351}
+  m_Layer: 0
+  m_Name: MissionStateSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &830361238340070382
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6869400033966778325}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6791863712683479124}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7040887272927529351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6869400033966778325}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5e874636815a8a41bc44d334c357d13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MissionStateClassifier
+  telemetryManager: {fileID: 0}
+  stateText: {fileID: 0}
+  stateDot: {fileID: 0}
+  debugText: {fileID: 0}
+  debugToggleKey: 291
+  debugEnabled: 0
+  safeBlue: {r: 0, g: 0.5803922, b: 1, a: 1}
+  warningAmber: {r: 1, g: 0.7490196, b: 0, a: 1}
+  dangerRed: {r: 1, g: 0.23137255, b: 0.1882353, a: 1}
+  neutralGrey: {r: 0.6039216, g: 0.654902, b: 0.69803923, a: 1}
+  ropDrillingMin: 1
+  wobDrillingMin: 2
+  rpmRotatingMin: 30
+  flowCirculatingMin: 200
+  torqueRotatingMin: 1
+  flowDiffLossWarn: 100
+  stableSeconds: 2
