@@ -33,6 +33,9 @@ public class TelemetryAlarmApplier : MonoBehaviour
 
     private readonly StringBuilder _sb = new StringBuilder(256);
 
+    public bool HasWarningActive { get; private set; }
+    public bool HasDangerActive { get; private set; }
+
     private void Reset()
     {
         telemetryManager = FindFirstObjectByType<TelemetryManager>();
@@ -49,6 +52,9 @@ public class TelemetryAlarmApplier : MonoBehaviour
         if (!telemetryManager) return;
         if (freezeColorsWhenPaused && ScrollPauseController.IsPaused) return;
 
+        HasWarningActive = false;
+        HasDangerActive = false;
+
         int lines = 0;
         if (activeAlarmsText) _sb.Clear();
 
@@ -64,6 +70,9 @@ public class TelemetryAlarmApplier : MonoBehaviour
 
                 TelemetrySeverity severity = t.rule != null ? t.rule.Evaluate(value) : TelemetrySeverity.Safe;
                 Color c = ColorFor(severity);
+
+                if (severity == TelemetrySeverity.Danger) HasDangerActive = true;
+                else if (severity == TelemetrySeverity.Warning) HasWarningActive = true;
 
                 if (t.valueText) t.valueText.color = c;
                 if (t.ring) t.ring.color = c;
