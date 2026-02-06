@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using TMPro;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -73,6 +74,39 @@ public class TelemetryManager : MonoBehaviour
     public float RxHz { get; private set; }
     public float CurrentDepth { get; private set; }
     public float LastSampleAgeSeconds { get; private set; }
+    public float RawDepth { get; private set; }
+    public float RawRop { get; private set; }
+    public float RawWob { get; private set; }
+    public float RawRpm { get; private set; }
+    public float RawTorque { get; private set; }
+    public float RawFlowIn { get; private set; }
+    public float RawFlowOut { get; private set; }
+    public float SmoothedDepth { get; private set; }
+    public float SmoothedRop { get; private set; }
+    public float SmoothedWob { get; private set; }
+    public float SmoothedRpm { get; private set; }
+    public float SmoothedTorque { get; private set; }
+    public float SmoothedFlowIn { get; private set; }
+    public float SmoothedFlowOut { get; private set; }
+
+    [Header("Smoothing (EMA)")]
+    [SerializeField] private bool smoothingEnabled = true;
+    [SerializeField, Range(0.01f, 1f)] private float emaAlpha = 0.2f;
+    [SerializeField] private bool smoothRop = true;
+    [SerializeField] private bool smoothWob = true;
+    [SerializeField] private bool smoothRpm = true;
+    [SerializeField] private bool smoothTorque = true;
+    [SerializeField] private bool smoothFlowIn = true;
+    [SerializeField] private bool smoothFlowOut = true;
+    [SerializeField] private bool smoothDepth = false;
+    [SerializeField] private bool useSmoothedForGauges = true;
+    [SerializeField] private bool useSmoothedForTrendlines = true;
+    [SerializeField] private bool showSmoothedNumbers = false;
+
+    [Header("Smoothing Debug (F9)")]
+    [SerializeField] private TMP_Text smoothingDebugText;
+    [SerializeField] private KeyCode smoothingDebugToggleKey = KeyCode.F9;
+    [SerializeField] private bool smoothingDebugEnabled = false;
 
     [Header("Units / Formatting")]
     [SerializeField] private string depthUnit = "m";
@@ -86,6 +120,22 @@ public class TelemetryManager : MonoBehaviour
     private readonly ConcurrentQueue<string> _jsonQueue = new ConcurrentQueue<string>();
     private int _packetsThisWindow = 0;
     private float _hzWindowTimer = 0f;
+
+    private float _rawDepth;
+    private float _rawRop;
+    private float _rawWob;
+    private float _rawRpm;
+    private float _rawTorque;
+    private float _rawFlowIn;
+    private float _rawFlowOut;
+
+    private EmaFilter _depthEma;
+    private EmaFilter _ropEma;
+    private EmaFilter _wobEma;
+    private EmaFilter _rpmEma;
+    private EmaFilter _torqueEma;
+    private EmaFilter _flowInEma;
+    private EmaFilter _flowOutEma;
 
     /// <summary>
     /// Call this from your Python receiver whenever JSON arrives.
@@ -104,6 +154,9 @@ public class TelemetryManager : MonoBehaviour
         TryAutoWireIfMissing();
 
         if (hzSmoothing <= 0f) hzSmoothing = 0.2f;
+        if (emaAlpha < 0.01f) emaAlpha = 0.01f;
+        if (emaAlpha > 1f) emaAlpha = 1f;
+        if (smoothingDebugText) smoothingDebugText.gameObject.SetActive(smoothingDebugEnabled);
 
         if (!ropGauge)
         {
@@ -174,6 +227,13 @@ public class TelemetryManager : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(smoothingDebugToggleKey))
+        {
+            smoothingDebugEnabled = !smoothingDebugEnabled;
+            if (smoothingDebugText) smoothingDebugText.gameObject.SetActive(smoothingDebugEnabled);
+            if (smoothingDebugEnabled) UpdateSmoothingDebug();
+        }
+
         LastSampleAgeSeconds += Time.unscaledDeltaTime;
         SecondsSinceLastPacket += Time.deltaTime;
         _hzWindowTimer += Time.deltaTime;
@@ -210,74 +270,135 @@ public class TelemetryManager : MonoBehaviour
 
     private void Apply(TelemetryPayload t)
     {
-        CurrentDepth = t.depth;
+        _rawDepth = t.depth;
+        _rawRop = t.rop;
+        _rawWob = t.wob;
+        _rawRpm = t.rpm;
+        _rawTorque = t.torque;
+        _rawFlowIn = t.flowIn;
+        _rawFlowOut = t.flowOut;
 
-        if (depthWidget)  depthWidget.SetValue($"{t.depth:0.0} {depthUnit}");
-        if (ropWidget)    ropWidget.SetValue($"{t.rop:0.0} {ropUnit}");
-        if (wobWidget)    wobWidget.SetValue($"{t.wob:0.0} {wobUnit}");
-        if (rpmWidget)    rpmWidget.SetValue($"{t.rpm:0} {rpmUnit}");
-        if (torqueWidget) torqueWidget.SetValue($"{t.torque:0.0} {torqueUnit}");
-        if (flowInWidget) flowInWidget.SetValue($"{t.flowIn:0.0} {flowUnit}");
-        if (flowOutWidget)flowOutWidget.SetValue($"{t.flowOut:0.0} {flowUnit}");
+        CurrentDepth = _rawDepth;
 
-        if (ropGauge)
+        float alpha = Mathf.Clamp(emaAlpha, 0.01f, 1f);
+        float smDepth = UpdateFilter(ref _depthEma, _rawDepth, smoothDepth, alpha);
+        float smRop = UpdateFilter(ref _ropEma, _rawRop, smoothRop, alpha);
+        float smWob = UpdateFilter(ref _wobEma, _rawWob, smoothWob, alpha);
+        float smRpm = UpdateFilter(ref _rpmEma, _rawRpm, smoothRpm, alpha);
+        float smTorque = UpdateFilter(ref _torqueEma, _rawTorque, smoothTorque, alpha);
+        float smFlowIn = UpdateFilter(ref _flowInEma, _rawFlowIn, smoothFlowIn, alpha);
+        float smFlowOut = UpdateFilter(ref _flowOutEma, _rawFlowOut, smoothFlowOut, alpha);
+
+        RawDepth = _rawDepth;
+        RawRop = _rawRop;
+        RawWob = _rawWob;
+        RawRpm = _rawRpm;
+        RawTorque = _rawTorque;
+        RawFlowIn = _rawFlowIn;
+        RawFlowOut = _rawFlowOut;
+
+        SmoothedDepth = smDepth;
+        SmoothedRop = smRop;
+        SmoothedWob = smWob;
+        SmoothedRpm = smRpm;
+        SmoothedTorque = smTorque;
+        SmoothedFlowIn = smFlowIn;
+        SmoothedFlowOut = smFlowOut;
+
+        float depthForText = (showSmoothedNumbers && smoothingEnabled && smoothDepth) ? smDepth : _rawDepth;
+        float ropForText = (showSmoothedNumbers && smoothingEnabled && smoothRop) ? smRop : _rawRop;
+        float wobForText = (showSmoothedNumbers && smoothingEnabled && smoothWob) ? smWob : _rawWob;
+        float rpmForText = (showSmoothedNumbers && smoothingEnabled && smoothRpm) ? smRpm : _rawRpm;
+        float torqueForText = (showSmoothedNumbers && smoothingEnabled && smoothTorque) ? smTorque : _rawTorque;
+        float flowInForText = (showSmoothedNumbers && smoothingEnabled && smoothFlowIn) ? smFlowIn : _rawFlowIn;
+        float flowOutForText = (showSmoothedNumbers && smoothingEnabled && smoothFlowOut) ? smFlowOut : _rawFlowOut;
+
+        if (depthWidget)  depthWidget.SetValue($"{depthForText:0.0} {depthUnit}");
+        if (ropWidget)    ropWidget.SetValue($"{ropForText:0.0} {ropUnit}");
+        if (wobWidget)    wobWidget.SetValue($"{wobForText:0.0} {wobUnit}");
+        if (rpmWidget)    rpmWidget.SetValue($"{rpmForText:0} {rpmUnit}");
+        if (torqueWidget) torqueWidget.SetValue($"{torqueForText:0.0} {torqueUnit}");
+        if (flowInWidget) flowInWidget.SetValue($"{flowInForText:0.0} {flowUnit}");
+        if (flowOutWidget)flowOutWidget.SetValue($"{flowOutForText:0.0} {flowUnit}");
+
+        bool freezeGauges = ScrollPauseController.IsPaused && useSmoothedForGauges;
+        if (!freezeGauges)
         {
-            ropGauge.SetMax(ropMax);
-            ropGauge.SetValue(t.rop);
-        }
+            float ropForGauge = (smoothingEnabled && useSmoothedForGauges && smoothRop) ? smRop : _rawRop;
+            float wobForGauge = (smoothingEnabled && useSmoothedForGauges && smoothWob) ? smWob : _rawWob;
+            float rpmForGauge = (smoothingEnabled && useSmoothedForGauges && smoothRpm) ? smRpm : _rawRpm;
+            float torqueForGauge = (smoothingEnabled && useSmoothedForGauges && smoothTorque) ? smTorque : _rawTorque;
+            float flowInForGauge = (smoothingEnabled && useSmoothedForGauges && smoothFlowIn) ? smFlowIn : _rawFlowIn;
+            float flowOutForGauge = (smoothingEnabled && useSmoothedForGauges && smoothFlowOut) ? smFlowOut : _rawFlowOut;
 
-        if (wobGauge)
-        {
-            wobGauge.SetMax(wobMax);
-            wobGauge.SetValue(t.wob);
-        }
-
-        if (rpmGauge)
-        {
-            rpmGauge.SetMax(rpmMax);
-            rpmGauge.SetValue(t.rpm);
-        }
-
-        if (torqueGauge)
-        {
-            torqueGauge.SetMax(torqueMax);
-            torqueGauge.SetValue(t.torque);
-        }
-
-        if (flowInGauge)
-        {
-            flowInGauge.SetMax(flowInMax);
-            flowInGauge.SetValue(t.flowIn);
-        }
-
-        if (flowOutGauge)
-        {
-            flowOutGauge.SetMax(flowOutMax);
-            flowOutGauge.SetValue(t.flowOut);
-
-            var delta = Mathf.Abs(t.flowIn - t.flowOut);
-            if (delta >= flowDeltaDanger)
+            if (ropGauge)
             {
-                flowOutGauge.SetAlertOverride(true, true);
+                ropGauge.SetMax(ropMax);
+                ropGauge.SetValue(ropForGauge);
             }
-            else if (delta >= flowDeltaWarning)
+
+            if (wobGauge)
             {
-                flowOutGauge.SetAlertOverride(true, false);
+                wobGauge.SetMax(wobMax);
+                wobGauge.SetValue(wobForGauge);
             }
-            else
+
+            if (rpmGauge)
             {
-                flowOutGauge.SetAlertOverride(false, false);
+                rpmGauge.SetMax(rpmMax);
+                rpmGauge.SetValue(rpmForGauge);
+            }
+
+            if (torqueGauge)
+            {
+                torqueGauge.SetMax(torqueMax);
+                torqueGauge.SetValue(torqueForGauge);
+            }
+
+            if (flowInGauge)
+            {
+                flowInGauge.SetMax(flowInMax);
+                flowInGauge.SetValue(flowInForGauge);
+            }
+
+            if (flowOutGauge)
+            {
+                flowOutGauge.SetMax(flowOutMax);
+                flowOutGauge.SetValue(flowOutForGauge);
+
+                var delta = Mathf.Abs(_rawFlowIn - _rawFlowOut);
+                if (delta >= flowDeltaDanger)
+                {
+                    flowOutGauge.SetAlertOverride(true, true);
+                }
+                else if (delta >= flowDeltaWarning)
+                {
+                    flowOutGauge.SetAlertOverride(true, false);
+                }
+                else
+                {
+                    flowOutGauge.SetAlertOverride(false, false);
+                }
             }
         }
 
-        Push01(ropSparkline, t.rop, ropMax);
-        Push01(wobSparkline, t.wob, wobMax);
-        Push01(rpmSparkline, t.rpm, rpmMax);
-        Push01(torqueSparkline, t.torque, torqueMax);
-        Push01(flowInSparkline, t.flowIn, flowInMax);
-        Push01(flowOutSparkline, t.flowOut, flowOutMax);
+        float ropForTrend = (smoothingEnabled && useSmoothedForTrendlines && smoothRop) ? smRop : _rawRop;
+        float wobForTrend = (smoothingEnabled && useSmoothedForTrendlines && smoothWob) ? smWob : _rawWob;
+        float rpmForTrend = (smoothingEnabled && useSmoothedForTrendlines && smoothRpm) ? smRpm : _rawRpm;
+        float torqueForTrend = (smoothingEnabled && useSmoothedForTrendlines && smoothTorque) ? smTorque : _rawTorque;
+        float flowInForTrend = (smoothingEnabled && useSmoothedForTrendlines && smoothFlowIn) ? smFlowIn : _rawFlowIn;
+        float flowOutForTrend = (smoothingEnabled && useSmoothedForTrendlines && smoothFlowOut) ? smFlowOut : _rawFlowOut;
 
-        if (stratigraphyTrack) stratigraphyTrack.SetDepth(t.depth);
+        Push01(ropSparkline, ropForTrend, ropMax);
+        Push01(wobSparkline, wobForTrend, wobMax);
+        Push01(rpmSparkline, rpmForTrend, rpmMax);
+        Push01(torqueSparkline, torqueForTrend, torqueMax);
+        Push01(flowInSparkline, flowInForTrend, flowInMax);
+        Push01(flowOutSparkline, flowOutForTrend, flowOutMax);
+
+        if (stratigraphyTrack) stratigraphyTrack.SetDepth(_rawDepth);
+
+        if (smoothingDebugEnabled) UpdateSmoothingDebug();
     }
 
     [ContextMenu("DEV: Push Sample JSON")]
@@ -301,8 +422,57 @@ public class TelemetryManager : MonoBehaviour
     private static void Push01(UiSparkline s, float value, float max)
     {
         if (!s) return;
+        if (ScrollPauseController.IsPaused) return;
         float denom = Mathf.Max(0.0001f, max);
         s.PushSample01(Mathf.Clamp01(value / denom));
+    }
+
+    public void ResetSmoothingToRaw()
+    {
+        _depthEma.Reset(_rawDepth);
+        _ropEma.Reset(_rawRop);
+        _wobEma.Reset(_rawWob);
+        _rpmEma.Reset(_rawRpm);
+        _torqueEma.Reset(_rawTorque);
+        _flowInEma.Reset(_rawFlowIn);
+        _flowOutEma.Reset(_rawFlowOut);
+        SmoothedDepth = _rawDepth;
+        SmoothedRop = _rawRop;
+        SmoothedWob = _rawWob;
+        SmoothedRpm = _rawRpm;
+        SmoothedTorque = _rawTorque;
+        SmoothedFlowIn = _rawFlowIn;
+        SmoothedFlowOut = _rawFlowOut;
+        if (smoothingDebugEnabled) UpdateSmoothingDebug();
+    }
+
+    private float UpdateFilter(ref EmaFilter filter, float raw, bool channelEnabled, float alpha)
+    {
+        if (!smoothingEnabled || !channelEnabled)
+        {
+            filter.Reset(raw);
+            return raw;
+        }
+        return filter.Update(raw, alpha);
+    }
+
+    private void UpdateSmoothingDebug()
+    {
+        if (!smoothingDebugEnabled || !smoothingDebugText) return;
+
+        float depthSm = SmoothedDepth;
+        float ropSm = SmoothedRop;
+        float torqueSm = SmoothedTorque;
+        float flowInSm = SmoothedFlowIn;
+
+        smoothingDebugText.text =
+            $"[Smoothing]\n" +
+            $"Enabled: {smoothingEnabled}  Alpha: {emaAlpha:0.###}\n" +
+            $"Depth: {_rawDepth:0.0} -> {depthSm:0.0}\n" +
+            $"ROP: {_rawRop:0.0} -> {ropSm:0.0}\n" +
+            $"Torque: {_rawTorque:0.0} -> {torqueSm:0.0}\n" +
+            $"FlowIn: {_rawFlowIn:0.0} -> {flowInSm:0.0}\n" +
+            $"Pause Visuals freezes visuals only; numbers stay live.";
     }
 
     private void TryAutoWireIfMissing()
