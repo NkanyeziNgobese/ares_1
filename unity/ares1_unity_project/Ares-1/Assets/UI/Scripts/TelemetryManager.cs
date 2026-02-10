@@ -73,7 +73,9 @@ public class TelemetryManager : MonoBehaviour
     [SerializeField] private float hzSmoothing = 0.2f;
     public float RxHz { get; private set; }
     public float CurrentDepth { get; private set; }
-    public float LastSampleAgeSeconds { get; private set; }
+    public float CurrentDepthMeters => CurrentDepth;
+    public bool HasSampleReceived { get; private set; }
+    public float LastSampleAgeSeconds { get; private set; } = float.PositiveInfinity;
     public float RawDepth { get; private set; }
     public float RawRop { get; private set; }
     public float RawWob { get; private set; }
@@ -253,6 +255,7 @@ public class TelemetryManager : MonoBehaviour
                 var t = JsonUtility.FromJson<TelemetryPayload>(json);
                 Apply(t);
                 LastSampleAgeSeconds = 0f;
+                HasSampleReceived = true;
             }
             catch (Exception e)
             {
