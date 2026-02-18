@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [DisallowMultipleComponent]
 public class HoistDepthMapper : MonoBehaviour
@@ -9,30 +10,33 @@ public class HoistDepthMapper : MonoBehaviour
 
     [Header("Depth Mapping")]
     [SerializeField] private bool enableHoist = true;
-    [SerializeField] private bool calibrateOnFirstSample = true;
-    [SerializeField] private bool freezeWhenPaused = true;
-    [SerializeField] private bool invertDepthSign = true;
+    [FormerlySerializedAs("freezeWhenPaused")]
+    [SerializeField] private bool respectPause = true;
+    [SerializeField] private bool invertDepthSign = false;
     [SerializeField] private bool drillingDownMovesBlockDown = true;
     [SerializeField] private Vector3 worldDownAxis = Vector3.down;
-    [SerializeField] private float smoothing = 0f; // 0 = no smoothing
-    [SerializeField] private float maxTravelMetersPerSecond = 5f;
+    [FormerlySerializedAs("maxTravelMetersPerSecond")]
+    [SerializeField] private float maxTravelSpeedMetersPerSec = 5f;
     [SerializeField] private float maxAbsDepthMeters = 5000f;
 
     [Header("Debug")]
     [SerializeField] private bool debugDraw = false;
     [SerializeField] private KeyCode toggleDebugKey = KeyCode.F8;
+    [SerializeField] private float debugLogIntervalSeconds = 0.25f;
 
     public float CurrentErrorMeters { get; private set; }
 
     private bool _calibrated;
     private float _refDepth;
-    private Vector3 _wellboreStartWorld;
-    private Vector3 _bitTipLocalInTravel;
-    private Vector3 _lastTravelWorld;
-    private bool _warnedMissingRefs;
+    private Vector3 _refBitWorldPos;
+    private Vector3 _cachedBitLocalInTravel;
+    private float _lastDesiredBitY;
     private float _nextDebugLogTime;
+    private bool _warnedMissingRefs;
 
     private const string LogPrefix = "[HoistDepthMapper]";
+    private const float FreshSampleMaxAgeSeconds = 2f;
+    private const float MoveEpsilonSqr = 0.0000001f;
 
     private void Reset()
     {
@@ -45,22 +49,19 @@ public class HoistDepthMapper : MonoBehaviour
         if (!rig) rig = FindFirstObjectByType<RigBindings>();
         if (!telemetry) telemetry = FindFirstObjectByType<TelemetryManager>();
 
-        if (worldDownAxis.sqrMagnitude < 0.000001f) worldDownAxis = Vector3.down;
-        if (smoothing < 0f) smoothing = 0f;
-        if (maxTravelMetersPerSecond < 0f) maxTravelMetersPerSecond = 0f;
-        if (maxAbsDepthMeters < 0f) maxAbsDepthMeters = 0f;
+        if (worldDownAxis.sqrMagnitude < 0.000001f)
+            worldDownAxis = Vector3.down;
 
-        if (!rig) Debug.LogWarning($"{LogPrefix} Missing RigBindings reference.", this);
-        if (!telemetry) Debug.LogWarning($"{LogPrefix} Missing TelemetryManager reference.", this);
-    }
+        if (maxTravelSpeedMetersPerSec < 0f)
+            maxTravelSpeedMetersPerSec = 0f;
 
-    private void Start()
-    {
-        if (rig && rig.TravelingBlock)
-            _lastTravelWorld = rig.TravelingBlock.position;
+        if (maxAbsDepthMeters < 0f)
+            maxAbsDepthMeters = 0f;
 
-        if (!calibrateOnFirstSample)
-            RecalibrateNow();
+        if (debugLogIntervalSeconds < 0.05f)
+            debugLogIntervalSeconds = 0.05f;
+
+        ValidateBindings(false);
     }
 
     private void LateUpdate()
@@ -71,151 +72,157 @@ public class HoistDepthMapper : MonoBehaviour
         if (!enableHoist)
             return;
 
-        if (freezeWhenPaused && ScrollPauseController.IsPaused)
+        if (!ValidateBindings(false))
             return;
 
-        if (!HasRequiredRefs())
+        if (!HasValidDepthSample(out float depthNow))
             return;
-
-        float depthNow = telemetry.CurrentDepthMeters;
-
-        if (calibrateOnFirstSample && !_calibrated && HasValidSample())
-            RecalibrateNow();
 
         if (!_calibrated)
+            Calibrate(depthNow);
+
+        float depthSign = invertDepthSign ? -1f : 1f;
+        float directionMultiplier = drillingDownMovesBlockDown ? 1f : -1f;
+        float deltaDepth = (depthNow - _refDepth) * depthSign * directionMultiplier;
+        if (maxAbsDepthMeters > 0f)
+            deltaDepth = Mathf.Clamp(deltaDepth, -maxAbsDepthMeters, maxAbsDepthMeters);
+
+        Vector3 downDir = NormalizeOrFallback(worldDownAxis, Vector3.down);
+        Vector3 desiredBitWorldPos = _refBitWorldPos + downDir * deltaDepth;
+        Vector3 desiredTravelWorldPos = desiredBitWorldPos - (rig.TravelingBlock.rotation * _cachedBitLocalInTravel);
+        Vector3 currentTravelWorldPos = rig.TravelingBlock.position;
+
+        _lastDesiredBitY = desiredBitWorldPos.y;
+
+        bool wouldMove = (desiredTravelWorldPos - currentTravelWorldPos).sqrMagnitude > MoveEpsilonSqr;
+        bool paused = respectPause && ScrollPauseController.IsPaused;
+
+        if (debugDraw && wouldMove)
+            TryLogMapping(depthNow, deltaDepth, desiredBitWorldPos.y, currentTravelWorldPos.y);
+
+        if (paused)
             return;
 
-        float deltaDepthMeters = depthNow - _refDepth;
-        if (invertDepthSign) deltaDepthMeters *= -1f;
-        if (maxAbsDepthMeters > 0f)
-            deltaDepthMeters = Mathf.Clamp(deltaDepthMeters, -maxAbsDepthMeters, maxAbsDepthMeters);
-        float dir = drillingDownMovesBlockDown ? 1f : -1f;
-
-        Vector3 down = worldDownAxis;
-        if (down.sqrMagnitude < 0.000001f) down = Vector3.down;
-        down.Normalize();
-
-        // Desired bit position is driven from the wellbore marker by depth delta.
-        Vector3 desiredBitWorld = _wellboreStartWorld + down * (deltaDepthMeters * dir);
-        Vector3 desiredTravelWorld = desiredBitWorld - (rig.TravelingBlock.rotation * _bitTipLocalInTravel);
-        Vector3 currentTravelWorld = rig.TravelingBlock.position;
-
-        if (smoothing > 0f)
-            desiredTravelWorld = Vector3.Lerp(currentTravelWorld, desiredTravelWorld, Time.deltaTime * smoothing);
-
-        float maxStep = maxTravelMetersPerSecond * Time.deltaTime;
-        rig.TravelingBlock.position = Vector3.MoveTowards(currentTravelWorld, desiredTravelWorld, maxStep);
-
-        _lastTravelWorld = rig.TravelingBlock.position;
-
-        CurrentErrorMeters = Vector3.Distance(rig.BitTipMarker.position, desiredBitWorld);
+        float step = maxTravelSpeedMetersPerSec * Time.deltaTime;
+        rig.TravelingBlock.position = Vector3.MoveTowards(currentTravelWorldPos, desiredTravelWorldPos, step);
+        CurrentErrorMeters = Vector3.Distance(rig.BitTipMarker.position, desiredBitWorldPos);
 
         if (debugDraw)
-        {
-            Debug.DrawLine(rig.BitTipMarker.position, rig.WellboreStartMarker.position, Color.white);
-            Debug.DrawLine(rig.BitTipMarker.position, desiredBitWorld, Color.white);
-
-            if (Time.unscaledTime >= _nextDebugLogTime)
-            {
-                Debug.Log(
-                    $"{LogPrefix} depthNow={depthNow:0.00}, refDepth={_refDepth:0.00}, delta={deltaDepthMeters:0.00}, " +
-                    $"localBitOffsetY={_bitTipLocalInTravel.y:0.000}, localBitOffsetMag={_bitTipLocalInTravel.magnitude:0.000}, " +
-                    $"desiredBitY={desiredBitWorld.y:0.000}, travelY={rig.TravelingBlock.position.y:0.000}, bitY={rig.BitTipMarker.position.y:0.000}, " +
-                    $"age={telemetry.LastSampleAgeSeconds:0.00}s, calibrated={_calibrated}",
-                    this);
-                _nextDebugLogTime = Time.unscaledTime + 0.5f;
-            }
-        }
+            Debug.DrawLine(rig.BitTipMarker.position, desiredBitWorldPos, Color.white);
     }
 
-    [ContextMenu("Recalibrate Now")]
-    public void RecalibrateNow()
+    [ContextMenu("ValidateNow")]
+    public void ValidateNow()
     {
-        if (TryCalibrate())
-            Debug.Log($"{LogPrefix} Recalibrated successfully.", this);
-        else
-            Debug.LogWarning($"{LogPrefix} Recalibration failed due to missing references.", this);
+        ValidateBindings(true);
     }
 
-    [ContextMenu("Print State")]
+    [ContextMenu("Recalibrate")]
+    public void Recalibrate()
+    {
+        _calibrated = false;
+        Debug.Log($"{LogPrefix} Calibration cleared. Waiting for next valid telemetry sample.", this);
+    }
+
+    [ContextMenu("PrintState")]
     public void PrintState()
     {
-        string rigState = rig ? "OK" : "MISSING";
-        string tmState = telemetry ? "OK" : "MISSING";
-        float depthNow = telemetry ? telemetry.CurrentDepthMeters : 0f;
-        float deltaDepthMeters = depthNow - _refDepth;
-        if (invertDepthSign) deltaDepthMeters *= -1f;
-        if (maxAbsDepthMeters > 0f)
-            deltaDepthMeters = Mathf.Clamp(deltaDepthMeters, -maxAbsDepthMeters, maxAbsDepthMeters);
-        float dir = drillingDownMovesBlockDown ? 1f : -1f;
-        Vector3 down = worldDownAxis.sqrMagnitude < 0.000001f ? Vector3.down : worldDownAxis.normalized;
-        Vector3 desiredBitWorld = _wellboreStartWorld + down * (deltaDepthMeters * dir);
-        Vector3 desiredTravelWorld = desiredBitWorld - (rig && rig.TravelingBlock ? (rig.TravelingBlock.rotation * _bitTipLocalInTravel) : Vector3.zero);
-        float travelY = (rig && rig.TravelingBlock) ? rig.TravelingBlock.position.y : 0f;
-        float bitY = (rig && rig.BitTipMarker) ? rig.BitTipMarker.position.y : 0f;
+        float depthNow = telemetry ? telemetry.CurrentDepthMeters : float.NaN;
+        float travelY = (rig && rig.TravelingBlock) ? rig.TravelingBlock.position.y : float.NaN;
 
         Debug.Log(
-            $"{LogPrefix} rig={rigState}, telemetry={tmState}, calibrated={_calibrated}, " +
-            $"depthNow={depthNow:0.00}, refDepth={_refDepth:0.00}, delta={deltaDepthMeters:0.00}, " +
-            $"bitTipLocalMag={_bitTipLocalInTravel.magnitude:0.000}, travelY={travelY:0.000}, bitY={bitY:0.000}, " +
-            $"desiredBitY={desiredBitWorld.y:0.000}, desiredTravelY={desiredTravelWorld.y:0.000}, " +
-            $"error={CurrentErrorMeters:0.000}m, age={ (telemetry ? telemetry.LastSampleAgeSeconds : float.PositiveInfinity):0.00}s, " +
-            $"enableHoist={enableHoist}, freezeWhenPaused={freezeWhenPaused}, calibrateOnFirstSample={calibrateOnFirstSample}",
+            $"{LogPrefix} calibrated={_calibrated}, depthNow={depthNow:0.000}, refDepth={_refDepth:0.000}, " +
+            $"worldDownAxis=({worldDownAxis.x:0.###},{worldDownAxis.y:0.###},{worldDownAxis.z:0.###}), " +
+            $"invertDepthSign={invertDepthSign}, lastDesiredBitY={_lastDesiredBitY:0.000}, currentTravelY={travelY:0.000}",
             this);
     }
 
-    private bool TryCalibrate()
+    private void Calibrate(float depthNow)
     {
-        if (!HasRequiredRefs())
+        _refDepth = depthNow;
+        _refBitWorldPos = rig.BitTipMarker.position;
+        _cachedBitLocalInTravel = rig.TravelingBlock.InverseTransformPoint(rig.BitTipMarker.position);
+        _calibrated = true;
+    }
+
+    private bool HasValidDepthSample(out float depthNow)
+    {
+        depthNow = float.NaN;
+        if (!telemetry)
             return false;
 
-        _refDepth = telemetry.CurrentDepthMeters;
-        _wellboreStartWorld = rig.WellboreStartMarker.position;
-        _bitTipLocalInTravel = rig.TravelingBlock.InverseTransformPoint(rig.BitTipMarker.position);
-        _lastTravelWorld = rig.TravelingBlock.position;
-        _calibrated = true;
+        depthNow = telemetry.CurrentDepthMeters;
+        if (float.IsNaN(depthNow) || float.IsInfinity(depthNow))
+            return false;
 
-        if (_bitTipLocalInTravel.magnitude > 50f)
-        {
-            Debug.LogWarning(
-                $"{LogPrefix} Local bit offset is large ({_bitTipLocalInTravel.magnitude:0.00}m). Check RigBindings assignments.",
-                this);
-        }
+        if (maxAbsDepthMeters > 0f && Mathf.Abs(depthNow) > maxAbsDepthMeters)
+            return false;
+
+        if (telemetry.LastSampleAgeSeconds > FreshSampleMaxAgeSeconds)
+            return false;
 
         return true;
     }
 
-    [ContextMenu("Print Current Mapping")]
-    public void PrintCurrentMapping()
+    private bool ValidateBindings(bool verbose)
     {
-        PrintState();
-    }
+        bool ok = true;
+        bool shouldLog = verbose || !_warnedMissingRefs;
 
-    private bool HasValidSample()
-    {
-        if (!telemetry) return false;
-        return telemetry.HasSampleReceived && telemetry.LastSampleAgeSeconds <= 2f;
-    }
-
-    private bool HasRequiredRefs()
-    {
-        if (!rig || !telemetry || !rig.TravelingBlock || !rig.BitTipMarker || !rig.WellboreStartMarker)
+        if (!rig)
         {
-            if (!_warnedMissingRefs)
-            {
-                if (!rig) Debug.LogWarning($"{LogPrefix} Missing RigBindings.", this);
-                if (!telemetry) Debug.LogWarning($"{LogPrefix} Missing TelemetryManager.", this);
-                if (rig && !rig.TravelingBlock) Debug.LogWarning($"{LogPrefix} RigBindings.TravelingBlock is missing.", this);
-                if (rig && !rig.BitTipMarker) Debug.LogWarning($"{LogPrefix} RigBindings.BitTipMarker is missing.", this);
-                if (rig && !rig.WellboreStartMarker) Debug.LogWarning($"{LogPrefix} RigBindings.WellboreStartMarker is missing.", this);
-                _warnedMissingRefs = true;
-            }
+            ok = false;
+            if (shouldLog) Debug.LogWarning($"{LogPrefix} Missing RigBindings reference.", this);
+        }
 
+        if (!telemetry)
+        {
+            ok = false;
+            if (shouldLog) Debug.LogWarning($"{LogPrefix} Missing TelemetryManager reference.", this);
+        }
+
+        if (rig && !rig.TravelingBlock)
+        {
+            ok = false;
+            if (shouldLog) Debug.LogWarning($"{LogPrefix} RigBindings.TravelingBlock is missing.", this);
+        }
+
+        if (rig && !rig.BitTipMarker)
+        {
+            ok = false;
+            if (shouldLog) Debug.LogWarning($"{LogPrefix} RigBindings.BitTipMarker is missing.", this);
+        }
+
+        if (!ok)
+        {
+            _warnedMissingRefs = true;
             _calibrated = false;
             return false;
         }
 
+        if (verbose)
+            Debug.Log($"{LogPrefix} ValidateNow OK.", this);
+
         _warnedMissingRefs = false;
         return true;
+    }
+
+    private static Vector3 NormalizeOrFallback(Vector3 value, Vector3 fallback)
+    {
+        if (value.sqrMagnitude < 0.000001f)
+            return fallback.normalized;
+        return value.normalized;
+    }
+
+    private void TryLogMapping(float depthNow, float deltaDepth, float desiredBitY, float travelY)
+    {
+        if (Time.unscaledTime < _nextDebugLogTime)
+            return;
+
+        Debug.Log(
+            $"{LogPrefix} depthNow={depthNow:0.000} refDepth={_refDepth:0.000} deltaDepth={deltaDepth:0.000} desiredBitY={desiredBitY:0.000} travelY={travelY:0.000}",
+            this);
+
+        _nextDebugLogTime = Time.unscaledTime + debugLogIntervalSeconds;
     }
 }
