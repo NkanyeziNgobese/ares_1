@@ -1,5 +1,8 @@
 using UnityEngine;
 using UnityEngine.Serialization;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 [DisallowMultipleComponent]
 public class HoistDepthMapper : MonoBehaviour
@@ -48,6 +51,8 @@ public class HoistDepthMapper : MonoBehaviour
     private bool _warnedMissingRefs;
     private bool _limitsInitWarned;
     private bool _limitsRangeWarned;
+    private bool _limitsInitialized;
+    private Transform _cachedTravelingBlock;
 
     private const string LogPrefix = "[HoistDepthMapper]";
     private const float FreshSampleMaxAgeSeconds = 2f;
@@ -85,8 +90,7 @@ public class HoistDepthMapper : MonoBehaviour
 
     private void Start()
     {
-        if (autoInitLimitsFromRig)
-            InitLimitsFromMarkersOrDefaults(false);
+        TryInitializeLimitsOnce();
     }
 
     private void LateUpdate()
@@ -99,6 +103,8 @@ public class HoistDepthMapper : MonoBehaviour
 
         if (!ValidateBindings(false))
             return;
+
+        TryInitializeLimitsOnce();
 
         if (!HasValidDepthSample(out float depthNow))
             return;
@@ -114,9 +120,13 @@ public class HoistDepthMapper : MonoBehaviour
 
         Vector3 downDir = NormalizeOrFallback(worldDownAxis, Vector3.down);
         Vector3 desiredBitWorldPos = _refBitWorldPos + downDir * deltaDepth;
-        Vector3 desiredTravelWorldPos = desiredBitWorldPos - (rig.TravelingBlock.rotation * _cachedBitLocalInTravel);
+        Transform travelingBlock = GetTravelingBlockTransform();
+        if (!travelingBlock)
+            return;
+
+        Vector3 desiredTravelWorldPos = desiredBitWorldPos - (travelingBlock.rotation * _cachedBitLocalInTravel);
         Vector3 unclampedDesiredTravelWorldPos = desiredTravelWorldPos;
-        Vector3 currentTravelWorldPos = rig.TravelingBlock.position;
+        Vector3 currentTravelWorldPos = travelingBlock.position;
 
         _lastDesiredBitY = desiredBitWorldPos.y;
         _lastUnclampedDesiredTravelY = desiredTravelWorldPos.y;
@@ -170,7 +180,7 @@ public class HoistDepthMapper : MonoBehaviour
             return;
 
         float step = maxTravelSpeedMetersPerSec * Time.deltaTime;
-        rig.TravelingBlock.position = Vector3.MoveTowards(currentTravelWorldPos, desiredTravelWorldPos, step);
+        travelingBlock.position = Vector3.MoveTowards(currentTravelWorldPos, desiredTravelWorldPos, step);
         CurrentErrorMeters = Vector3.Distance(rig.BitTipMarker.position, desiredBitWorldPos);
 
         if (debugDraw)
@@ -204,7 +214,8 @@ public class HoistDepthMapper : MonoBehaviour
     public void PrintState()
     {
         float depthNow = telemetry ? telemetry.CurrentDepthMeters : float.NaN;
-        float travelY = (rig && rig.TravelingBlock) ? rig.TravelingBlock.position.y : float.NaN;
+        Transform travelingBlock = GetTravelingBlockTransform();
+        float travelY = travelingBlock ? travelingBlock.position.y : float.NaN;
 
         Debug.Log(
             $"{LogPrefix} calibrated={_calibrated}, depthNow={depthNow:0.000}, refDepth={_refDepth:0.000}, " +
@@ -219,27 +230,49 @@ public class HoistDepthMapper : MonoBehaviour
     [ContextMenu("Set Min From Current")]
     public void SetMinFromCurrent()
     {
-        if (!rig || !rig.TravelingBlock)
+        Transform travelingBlock = GetTravelingBlockTransform();
+        if (!travelingBlock)
         {
-            Debug.LogWarning($"{LogPrefix} Cannot set min limit: RigBindings or TravelingBlock is missing.", this);
+            Debug.LogWarning($"{LogPrefix} Cannot set min limit: TravelingBlock reference could not be resolved.", this);
             return;
         }
 
-        minTravelWorldY = rig.TravelingBlock.position.y;
-        Debug.Log($"{LogPrefix} minTravelWorldY set from current traveling block Y: {minTravelWorldY:0.###}", this);
+        float travelY = travelingBlock.position.y;
+#if UNITY_EDITOR
+        if (!Application.isPlaying)
+            Undo.RecordObject(this, "Set Hoist Travel Limit");
+#endif
+        minTravelWorldY = travelY;
+        _limitsInitialized = true;
+#if UNITY_EDITOR
+        if (!Application.isPlaying)
+            EditorUtility.SetDirty(this);
+#endif
+        Debug.Log($"{LogPrefix} Set minTravelWorldY={minTravelWorldY:F3} from current travelY={travelY:F3}", this);
     }
 
     [ContextMenu("Set Max From Current")]
     public void SetMaxFromCurrent()
     {
-        if (!rig || !rig.TravelingBlock)
+        Transform travelingBlock = GetTravelingBlockTransform();
+        if (!travelingBlock)
         {
-            Debug.LogWarning($"{LogPrefix} Cannot set max limit: RigBindings or TravelingBlock is missing.", this);
+            Debug.LogWarning($"{LogPrefix} Cannot set max limit: TravelingBlock reference could not be resolved.", this);
             return;
         }
 
-        maxTravelWorldY = rig.TravelingBlock.position.y;
-        Debug.Log($"{LogPrefix} maxTravelWorldY set from current traveling block Y: {maxTravelWorldY:0.###}", this);
+        float travelY = travelingBlock.position.y;
+#if UNITY_EDITOR
+        if (!Application.isPlaying)
+            Undo.RecordObject(this, "Set Hoist Travel Limit");
+#endif
+        maxTravelWorldY = travelY;
+        _limitsInitialized = true;
+#if UNITY_EDITOR
+        if (!Application.isPlaying)
+            EditorUtility.SetDirty(this);
+#endif
+        Debug.Log($"{LogPrefix} Set maxTravelWorldY={maxTravelWorldY:F3} from current travelY={travelY:F3}", this);
     }
 
     [ContextMenu("Init Limits From Markers/Defaults")]
@@ -250,9 +283,13 @@ public class HoistDepthMapper : MonoBehaviour
 
     private void Calibrate(float depthNow)
     {
+        Transform travelingBlock = GetTravelingBlockTransform();
+        if (!travelingBlock)
+            return;
+
         _refDepth = depthNow;
         _refBitWorldPos = rig.BitTipMarker.position;
-        _cachedBitLocalInTravel = rig.TravelingBlock.InverseTransformPoint(rig.BitTipMarker.position);
+        _cachedBitLocalInTravel = travelingBlock.InverseTransformPoint(rig.BitTipMarker.position);
         _calibrated = true;
     }
 
@@ -292,7 +329,8 @@ public class HoistDepthMapper : MonoBehaviour
             if (shouldLog) Debug.LogWarning($"{LogPrefix} Missing TelemetryManager reference.", this);
         }
 
-        if (rig && !rig.TravelingBlock)
+        Transform travelingBlock = GetTravelingBlockTransform();
+        if (!travelingBlock)
         {
             ok = false;
             if (shouldLog) Debug.LogWarning($"{LogPrefix} RigBindings.TravelingBlock is missing.", this);
@@ -353,34 +391,44 @@ public class HoistDepthMapper : MonoBehaviour
 
     private void InitLimitsFromMarkersOrDefaults(bool force)
     {
-        bool uninitialized = Mathf.Approximately(minTravelWorldY, 0f) && Mathf.Approximately(maxTravelWorldY, 0f);
+        bool uninitialized = AreLimitsUninitialized();
         if (!force && !uninitialized)
             return;
 
         bool setAny = false;
+        string minSource = "none";
+        string maxSource = "none";
 
         if (maxTravelMarker)
         {
             maxTravelWorldY = maxTravelMarker.position.y;
+            maxSource = "maxTravelMarker";
             setAny = true;
         }
         else if (rig && rig.CrownBlock)
         {
             maxTravelWorldY = rig.CrownBlock.position.y - 0.25f;
+            maxSource = "rig.CrownBlock - 0.25";
             setAny = true;
         }
 
         if (minTravelMarker)
         {
             minTravelWorldY = minTravelMarker.position.y;
+            minSource = "minTravelMarker";
             setAny = true;
         }
-        else if (rig && rig.TravelingBlock)
+        else
         {
-            minTravelWorldY = rig.TravelingBlock.position.y - 2.0f;
-            setAny = true;
+            Transform travelingBlock = GetTravelingBlockTransform();
+            if (travelingBlock)
+            {
+                minTravelWorldY = travelingBlock.position.y - 2.0f;
+                minSource = "travelingBlock - 2.0";
+                setAny = true;
+            }
 
-            if (!_limitsInitWarned)
+            if (travelingBlock && !_limitsInitWarned)
             {
                 Debug.LogWarning(
                     $"{LogPrefix} Bottom travel limit initialized from TravelingBlock - 2.0m. " +
@@ -390,21 +438,53 @@ public class HoistDepthMapper : MonoBehaviour
             }
         }
 
-        if (force)
+        _limitsInitialized = true;
+
+        if (setAny)
         {
-            if (setAny)
-            {
-                Debug.Log(
-                    $"{LogPrefix} Initialized limits. minTravelWorldY={minTravelWorldY:0.###}, maxTravelWorldY={maxTravelWorldY:0.###}.",
-                    this);
-            }
-            else
-            {
-                Debug.LogWarning(
-                    $"{LogPrefix} Could not initialize travel limits from markers/defaults. Assign markers or RigBindings refs.",
-                    this);
-            }
+            Debug.Log(
+                $"{LogPrefix} Init limits from markers/defaults: minSource={minSource}, maxSource={maxSource}, " +
+                $"minTravelWorldY={minTravelWorldY:F3}, maxTravelWorldY={maxTravelWorldY:F3}",
+                this);
         }
+        else if (force)
+        {
+            Debug.LogWarning(
+                $"{LogPrefix} Could not initialize travel limits from markers/defaults. Assign markers or RigBindings refs.",
+                this);
+        }
+    }
+
+    private void TryInitializeLimitsOnce()
+    {
+        if (_limitsInitialized) return;
+        if (!useTravelLimits) return;
+        if (!(autoInitLimitsFromRig || minTravelMarker || maxTravelMarker)) return;
+
+        if (!AreLimitsUninitialized())
+        {
+            _limitsInitialized = true;
+            return;
+        }
+
+        InitLimitsFromMarkersOrDefaults(false);
+    }
+
+    private bool AreLimitsUninitialized()
+    {
+        return Mathf.Approximately(minTravelWorldY, 0f) && Mathf.Approximately(maxTravelWorldY, 0f);
+    }
+
+    private Transform GetTravelingBlockTransform()
+    {
+        Transform travel = rig ? rig.TravelingBlock : null;
+        if (travel)
+        {
+            _cachedTravelingBlock = travel;
+            return travel;
+        }
+
+        return _cachedTravelingBlock;
     }
 
     private static Vector3 NormalizeOrFallback(Vector3 value, Vector3 fallback)
